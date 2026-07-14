@@ -1,0 +1,103 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { Check, ImagePlus, Link2, Plus, Trash2 } from "lucide-react";
+import { formatPrice } from "@/lib/projects";
+
+type DraftMaterial = {
+  id: number;
+  name: string;
+  url: string;
+  quantity: number;
+  priceEuro: string;
+};
+
+const emptyMaterial = (id: number): DraftMaterial => ({ id, name: "", url: "", quantity: 1, priceEuro: "" });
+
+function euroInputToMinor(value: string) {
+  const normalized = value.replace(",", ".");
+  const parsed = Number.parseFloat(normalized);
+  return Number.isFinite(parsed) ? Math.max(0, Math.round(parsed * 100)) : 0;
+}
+
+export function ProjectForm() {
+  const [materials, setMaterials] = useState<DraftMaterial[]>([emptyMaterial(1)]);
+  const [submitted, setSubmitted] = useState(false);
+
+  const total = useMemo(
+    () => materials.reduce((sum, material) => sum + euroInputToMinor(material.priceEuro) * Math.max(0, material.quantity), 0),
+    [materials],
+  );
+
+  function updateMaterial(id: number, patch: Partial<DraftMaterial>) {
+    setSubmitted(false);
+    setMaterials((current) => current.map((material) => material.id === id ? { ...material, ...patch } : material));
+  }
+
+  function addMaterial() {
+    const nextId = Math.max(0, ...materials.map((material) => material.id)) + 1;
+    setMaterials((current) => [...current, emptyMaterial(nextId)]);
+  }
+
+  function removeMaterial(id: number) {
+    setMaterials((current) => current.length === 1 ? [emptyMaterial(1)] : current.filter((material) => material.id !== id));
+  }
+
+  return (
+    <form className="project-form" onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }}>
+      <section className="form-section">
+        <div className="form-section-title"><span>01</span><div><h2>Das Projekt</h2><p>Name, Bild und die Idee dahinter.</p></div></div>
+        <div className="form-grid">
+          <label className="field field-wide">
+            <span>Projektname</span>
+            <input required name="name" placeholder="z. B. Eine eigene Gartenbank" onChange={() => setSubmitted(false)} />
+          </label>
+          <label className="field field-wide">
+            <span>Beschreibung</span>
+            <textarea required name="description" rows={5} placeholder="Was möchtest du bauen und wofür soll es später da sein?" onChange={() => setSubmitted(false)} />
+          </label>
+          <label className="image-upload field-wide">
+            <ImagePlus size={28} aria-hidden="true" />
+            <span><strong>Vorschaubild auswählen</strong>JPG, PNG oder WebP · im Prototyp noch ohne Upload</span>
+            <input type="file" accept="image/png,image/jpeg,image/webp" disabled />
+          </label>
+        </div>
+      </section>
+
+      <section className="form-section">
+        <div className="form-section-title"><span>02</span><div><h2>Die Materialien</h2><p>Füge Links, Mengen und vorerst einen manuellen Preis hinzu.</p></div></div>
+        <div className="draft-materials">
+          {materials.map((material, index) => (
+            <div className="draft-material" key={material.id}>
+              <div className="draft-material-head">
+                <strong>Material {String(index + 1).padStart(2, "0")}</strong>
+                <button type="button" className="icon-button" onClick={() => removeMaterial(material.id)} aria-label={`Material ${index + 1} entfernen`}>
+                  <Trash2 size={17} aria-hidden="true" />
+                </button>
+              </div>
+              <div className="material-form-grid">
+                <label className="field material-name"><span>Bezeichnung</span><input required value={material.name} placeholder="Konstruktionsholz" onChange={(event) => updateMaterial(material.id, { name: event.target.value })} /></label>
+                <label className="field material-url"><span>Produktlink</span><div className="input-with-icon"><Link2 size={17} /><input type="url" required value={material.url} placeholder="https://..." onChange={(event) => updateMaterial(material.id, { url: event.target.value })} /></div></label>
+                <label className="field"><span>Menge</span><input type="number" min="0.1" step="0.1" required value={material.quantity} onChange={(event) => updateMaterial(material.id, { quantity: Number(event.target.value) })} /></label>
+                <label className="field"><span>Preis pro Stück</span><div className="input-with-suffix"><input inputMode="decimal" required value={material.priceEuro} placeholder="0,00" onChange={(event) => updateMaterial(material.id, { priceEuro: event.target.value })} /><span>€</span></div></label>
+              </div>
+            </div>
+          ))}
+        </div>
+        <button className="secondary-button" type="button" onClick={addMaterial}><Plus size={18} /> Weiteres Material</button>
+      </section>
+
+      <div className="form-submit-bar">
+        <div><span>Aktuelle Materialsumme</span><strong>{formatPrice(total)}</strong></div>
+        <button className="primary-button" type="submit">Entwurf prüfen <Check size={18} /></button>
+      </div>
+
+      {submitted && (
+        <div className="form-success" role="status">
+          <Check size={20} aria-hidden="true" />
+          <p><strong>Der Formularablauf funktioniert.</strong> Sobald Anmeldung und Datenbank verbunden sind, wird dieser Entwurf dauerhaft gespeichert.</p>
+        </div>
+      )}
+    </form>
+  );
+}
