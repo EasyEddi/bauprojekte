@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
-  <title id="title">Hochbeet aus Lärche</title><desc id="desc">Ein bepflanztes Hochbeet aus Lärchenholz</desc>
-  <rect width="1200" height="900" fill="#dce3cf"/><path d="M0 590Q280 520 540 590T1200 560V900H0Z" fill="#91ab70"/><circle cx="168" cy="145" r="76" fill="#f1c868"/>
-  <g fill="#567956"><path d="m920 605 110-395 115 395Z"/><path d="M40 610 138 315l105 295Z"/></g>
-  <g stroke="#4b3a2e" stroke-width="12" stroke-linejoin="round"><path d="m280 470 585-35 75 105-595 55Z" fill="#6e5039"/><path d="m345 595 595-55-25 260-568 40Z" fill="#b87b4d"/><path d="m354 660 572-48M351 730l568-43" fill="none" opacity=".55"/></g>
-  <g stroke="#31523c" stroke-width="13" stroke-linecap="round" fill="none"><path d="M430 490q-25-120-82-166M512 477q5-150 42-215M630 470q-5-140-70-190M744 455q20-115 76-165M838 453q-5-90-52-133"/></g>
-  <g fill="#4f8a58"><ellipse cx="346" cy="322" rx="57" ry="26" transform="rotate(35 346 322)"/><ellipse cx="558" cy="275" rx="55" ry="27" transform="rotate(-35 558 275)"/><ellipse cx="612" cy="315" rx="60" ry="29" transform="rotate(28 612 315)"/><ellipse cx="824" cy="290" rx="58" ry="26" transform="rotate(-30 824 290)"/></g>
-  <g fill="#c84f42"><circle cx="430" cy="380" r="21"/><circle cx="742" cy="370" r="18"/><circle cx="802" cy="390" r="20"/></g>
-</svg>

@@ -65,11 +65,11 @@
 
 ## Gestaltungsrichtung
 
-- Freundlich, handwerklich und modern statt wie ein Onlineshop
-- Große Projektbilder und klar lesbare Preise
+- Schlichte, funktionale Übersicht ohne Hero-Bereich, Sprüche oder dekorative Zusatzblöcke
+- Projektkacheln zeigen nur Bild, Name und Preis
 - Kartenraster auf Desktop, einspaltige Liste auf kleinen Smartphones
 - Gut erreichbares Plus als schwebende Aktion am unteren Rand
-- Ruhige Natur- und Werkstattfarben; genaue visuelle Richtung wird vor der Umsetzung festgelegt
+- Zurückhaltende neutrale Farben und möglichst wenig visuelle Ablenkung
 
 ## Fachliche Regeln
 
@@ -87,4 +87,3 @@
 - Summen stimmen auch bei Mengen größer als eins.
 - Fehlgeschlagene Preisprüfungen verhindern nicht das Speichern eines Projekts.
 - Fremde Besucher können keine Inhalte erstellen oder verändern.
-
