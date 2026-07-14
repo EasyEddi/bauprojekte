@@ -3,7 +3,8 @@ import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { extractProductPrice, type ParsedPrice } from "@/lib/price-parser";
 
-const maximumBytes = 1_500_000;
+const maximumBytes = 8_000_000;
+const scanIntervalBytes = 256_000;
 
 export class PriceFetchError extends Error {}
 
@@ -56,13 +57,12 @@ async function validateTarget(value: string) {
   return url;
 }
 
-async function readLimited(response: Response) {
-  const declaredLength = Number(response.headers.get("content-length"));
-  if (Number.isFinite(declaredLength) && declaredLength > maximumBytes) throw new PriceFetchError("Die Produktseite ist zu groß.");
+async function readPriceLimited(response: Response) {
   if (!response.body) throw new PriceFetchError("Die Produktseite enthält keine lesbaren Daten.");
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let total = 0;
+  let nextScan = 0;
   let content = "";
   while (true) {
     const { done, value } = await reader.read();
@@ -73,8 +73,16 @@ async function readLimited(response: Response) {
       throw new PriceFetchError("Die Produktseite ist zu groß.");
     }
     content += decoder.decode(value, { stream: true });
+    if (total >= nextScan) {
+      const result = extractProductPrice(content);
+      if (result) {
+        await reader.cancel();
+        return result;
+      }
+      nextScan = total + scanIntervalBytes;
+    }
   }
-  return content + decoder.decode();
+  return extractProductPrice(content + decoder.decode());
 }
 
 export async function fetchProductPrice(value: string): Promise<ParsedPrice> {
@@ -101,7 +109,7 @@ export async function fetchProductPrice(value: string): Promise<ParsedPrice> {
       if (!response.ok) throw new PriceFetchError(`Der Shop antwortet mit Status ${response.status}.`);
       const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
       if (!contentType.includes("html") && !contentType.includes("json")) throw new PriceFetchError("Der Link führt nicht zu einer lesbaren Produktseite.");
-      const result = extractProductPrice(await readLimited(response));
+      const result = await readPriceLimited(response);
       if (!result) throw new PriceFetchError("Auf der Produktseite wurde kein maschinenlesbarer Euro-Preis gefunden.");
       return result;
     }
