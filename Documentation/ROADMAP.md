@@ -6,17 +6,18 @@
 - [x] Technische Architektur festlegen
 - [x] Datenmodell skizzieren
 - [x] Risiken der automatischen Preisermittlung dokumentieren
-- [ ] Endgültigen Namen und visuelle Richtung festlegen
+- [x] Arbeitsnamen und erste visuelle Richtung festlegen
 
 ## Phase 1 – Öffentlicher Prototyp
 
-- [ ] Next.js-Projekt mit TypeScript und Tailwind anlegen
-- [ ] Beispieldaten lokal hinterlegen
-- [ ] Responsive Kachelübersicht umsetzen
-- [ ] Projektdetailseite umsetzen
-- [ ] Materialliste und korrekte Summenberechnung umsetzen
-- [ ] Leere, ladende und fehlerhafte Zustände gestalten
-- [ ] Erste visuelle Abnahme auf Smartphone und Desktop
+- [x] Next.js-Projekt mit TypeScript und Tailwind anlegen
+- [x] Beispieldaten lokal hinterlegen
+- [x] Responsive Kachelübersicht umsetzen
+- [x] Projektdetailseite umsetzen
+- [x] Materialliste und korrekte Summenberechnung umsetzen
+- [x] Leere und nicht gefundene Zustände gestalten
+- [x] Interaktiven, noch nicht persistenten Erstellen-Prototyp umsetzen
+- [x] Erste visuelle Abnahme auf Smartphone und Desktop
 
 ## Phase 2 – Daten und Verwaltung
 
@@ -56,4 +57,3 @@
 - Ein kaputter oder blockierter Shop-Link macht das Projekt nicht unbenutzbar.
 - Jeder Preis zeigt Quelle und Zeitpunkt der letzten Prüfung.
 - Die Website ist auf einem typischen Smartphone bequem bedienbar.
-

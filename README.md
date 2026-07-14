@@ -6,7 +6,9 @@ Familie und Freunde können sehen, was als Nächstes gebaut werden soll, welche 
 
 ## Status
 
-Das Projekt befindet sich in der Planungsphase. Dieses Repository enthält zunächst nur die fachliche und technische Dokumentation. Die Website selbst wird in einem späteren Schritt umgesetzt und über Vercel veröffentlicht.
+Der öffentliche Frontend-Prototyp ist umgesetzt und produktionsfähig baubar. Er enthält die responsive Projektübersicht, statisch generierte Detailseiten, Beispielmaterialien mit korrekten Summen sowie den interaktiven Entwurf für das Erstellen neuer Projekte.
+
+Die Inhalte stammen aktuell noch aus lokalen Beispieldaten. Anmeldung, Datenbank, Bild-Upload und echte Preisabfragen folgen in der nächsten Ausbaustufe. Das Erstellen-Formular kennzeichnet diesen Zustand sichtbar und speichert noch keine öffentlichen Daten.
 
 ## Geplanter Funktionsumfang
 
@@ -33,7 +35,23 @@ Das Projekt befindet sich in der Planungsphase. Dieses Repository enthält zunä
 - Supabase für Datenbank, Anmeldung und Bildspeicher
 - Vercel für Hosting, Serverfunktionen und geplante Preisprüfungen
 
+## Lokal starten
+
+Voraussetzung ist eine aktuelle Node.js-Version mit pnpm.
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Die Produktionsprüfung läuft mit:
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm build
+```
+
 ## Wichtiger Hinweis zur Preisaktualisierung
 
 Ein beliebiger Shop-Link kann nicht garantiert dauerhaft automatisch ausgelesen werden. Shops ändern ihre Seiten, laden Preise erst im Browser nach oder blockieren automatisierte Zugriffe. Deshalb ist eine gestufte Lösung vorgesehen: strukturierte Produktdaten auslesen, später Shop-spezifische Adapter ergänzen und immer einen manuellen Preis als Rückfalloption anbieten.
-

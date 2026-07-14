@@ -15,10 +15,10 @@ out/
 
 # logs
 *.log
+*.tsbuildinfo
 
 # operating systems and editors
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
-
