@@ -20,7 +20,7 @@ export type Project = {
   name: string;
   summary: string;
   description: string;
-  image: string;
+  image: string | null;
   imageAlt: string;
   status: string;
   difficulty: string;

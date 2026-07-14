@@ -6,7 +6,9 @@ export function ProjectCard({ project, priority = false }: { project: Project; p
   return (
     <Link className="project-card" href={`/projekte/${project.slug}`} aria-label={`${project.name} ansehen`}>
       <div className="card-image">
-        <Image src={project.image} alt={project.imageAlt} fill priority={priority} sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 33vw" />
+        {project.image
+          ? <Image src={project.image} alt={project.imageAlt} fill priority={priority} sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 33vw" />
+          : <div className="card-image-empty" aria-hidden="true" />}
       </div>
       <div className="card-body">
         <h2>{project.name}</h2>

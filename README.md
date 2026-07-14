@@ -8,15 +8,15 @@ Familie und Freunde können sehen, was als Nächstes gebaut werden soll, welche 
 
 ## Status
 
-Die öffentliche Anwendung ist über Vercel erreichbar. Die Startseite ist bewusst auf ein reines Kachelraster reduziert. Kacheln zeigen ausschließlich Bild, Projektname und Gesamtkosten. Platzhalterprojekte werden nicht veröffentlicht.
+Die öffentliche Anwendung ist über Vercel erreichbar. Die Startseite ist bewusst auf ein reines Kachelraster reduziert. Kacheln zeigen Projektname, Gesamtkosten und – falls vorhanden – ein Vorschaubild. Platzhalterprojekte werden nicht veröffentlicht.
 
-Projekte und Bilder werden dauerhaft in Vercel Blob gespeichert. Das Erstellen-Formular ist serverseitig mit einem Admin-Passwort geschützt; gespeicherte Projekte erscheinen anschließend öffentlich in Übersicht und Detailansicht. Automatische Preisabfragen folgen in einer späteren Ausbaustufe, aktuell wird der Preis manuell eingetragen.
+Projekte und optionale Bilder werden dauerhaft in Vercel Blob gespeichert. Das Erstellen-Formular ist serverseitig mit einem Admin-Passwort geschützt; gespeicherte Projekte erscheinen anschließend öffentlich in Übersicht und Detailansicht. Materialpreise werden beim Eingeben des Produktlinks serverseitig aus strukturierten Produktdaten oder Preis-Meta-Tags ermittelt. Nur wenn ein Shop keinen auslesbaren Preis liefert, erscheint ein manueller Ersatzpreis.
 
 ## Geplanter Funktionsumfang
 
 - Öffentliche Übersicht aller Bauprojekte
-- Projektkacheln mit Bild, Name und automatisch berechneter Kostensumme
-- Detailansicht mit Beschreibung und vollständiger Materialliste
+- Projektkacheln mit optionalem Bild, Name und automatisch berechneter Kostensumme
+- Detailansicht mit optionaler Beschreibung und vollständiger Materialliste
 - Materialeinträge mit Shop-Link, Menge, Einzelpreis und Gesamtpreis
 - Geschützter Verwaltungsbereich zum Erstellen und Bearbeiten von Projekten
 - Automatische Preisprüfung mit sichtbarem Prüfzeitpunkt und manuellem Ersatzpreis
@@ -59,4 +59,4 @@ pnpm build
 
 ## Wichtiger Hinweis zur Preisaktualisierung
 
-Ein beliebiger Shop-Link kann nicht garantiert dauerhaft automatisch ausgelesen werden. Shops ändern ihre Seiten, laden Preise erst im Browser nach oder blockieren automatisierte Zugriffe. Deshalb ist eine gestufte Lösung vorgesehen: strukturierte Produktdaten auslesen, später Shop-spezifische Adapter ergänzen und immer einen manuellen Preis als Rückfalloption anbieten.
+Ein beliebiger Shop-Link kann nicht garantiert automatisch ausgelesen werden. Shops ändern ihre Seiten, laden Preise erst im Browser nach oder blockieren automatisierte Zugriffe. Deshalb arbeitet die Preisprüfung gestuft: strukturierte Produktdaten, danach standardisierte Meta-Tags und bei Fehlschlag ein manueller Ersatzpreis. Shop-spezifische Adapter sowie regelmäßige Preisaktualisierungen sind spätere Ausbaustufen.

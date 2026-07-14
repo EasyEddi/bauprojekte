@@ -6,8 +6,8 @@ Diese Datei ist vor jeder Änderung am Repository vollständig zu lesen.
 
 - Die Website ist öffentlich lesbar, aber nicht öffentlich beschreibbar.
 - Das schwebende Plus bleibt der zentrale Einstieg zum Erstellen eines Projekts.
-- Projektkarten zeigen mindestens Bild, Name und aktuelle geschätzte Gesamtkosten.
-- Eine Projektseite zeigt oben Bild, Name und Preis, danach Beschreibung und Materialliste.
+- Projektkarten zeigen Name, aktuelle geschätzte Gesamtkosten und ein Vorschaubild, falls eines hinterlegt wurde.
+- Eine Projektseite zeigt oben Name, Preis und das optionale Bild, danach die optionale Beschreibung und die Materialliste.
 - Materialien zeigen Link, Menge, Einzelpreis, Zeilensumme, Preisstatus und Prüfzeitpunkt.
 - Automatische Preise dürfen nie als garantiert aktuell bezeichnet werden.
 - Fehlgeschlagene Preisermittlung braucht immer eine verständliche manuelle Ausweichmöglichkeit.

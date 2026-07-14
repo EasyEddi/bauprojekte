@@ -29,8 +29,8 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
 type NewProject = {
   name: string;
   description: string;
-  image: File;
-  materials: Array<Pick<Material, "name" | "productUrl" | "quantity" | "unitPriceMinor">>;
+  image: File | null;
+  materials: Array<Pick<Material, "name" | "productUrl" | "quantity" | "unitPriceMinor" | "priceStatus">>;
 };
 
 function slugify(name: string) {
@@ -46,11 +46,15 @@ function slugify(name: string) {
 
 export async function saveProject(input: NewProject): Promise<Project> {
   const slug = slugify(input.name);
-  const extension = input.image.type === "image/png" ? "png" : input.image.type === "image/webp" ? "webp" : "jpg";
-  const imageBlob = await put(`images/${slug}.${extension}`, input.image, {
-    access: "public",
-    addRandomSuffix: false,
-  });
+  let imageUrl: string | null = null;
+  if (input.image) {
+    const extension = input.image.type === "image/png" ? "png" : input.image.type === "image/webp" ? "webp" : "jpg";
+    const imageBlob = await put(`images/${slug}.${extension}`, input.image, {
+      access: "public",
+      addRandomSuffix: false,
+    });
+    imageUrl = imageBlob.url;
+  }
 
   const now = new Date();
   const project: Project = {
@@ -60,7 +64,7 @@ export async function saveProject(input: NewProject): Promise<Project> {
     name: input.name,
     summary: input.description.slice(0, 180),
     description: input.description,
-    image: imageBlob.url,
+    image: imageUrl,
     imageAlt: input.name,
     status: "Geplant",
     difficulty: "Noch offen",
@@ -73,7 +77,7 @@ export async function saveProject(input: NewProject): Promise<Project> {
       unitLabel: "Stück",
       unitPriceMinor: material.unitPriceMinor,
       currency: "EUR",
-      priceStatus: "manual",
+      priceStatus: material.priceStatus,
       lastCheckedLabel: now.toLocaleDateString("de-DE"),
       sortOrder: index + 1,
     })),

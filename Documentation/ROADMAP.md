@@ -31,9 +31,9 @@
 
 ## Phase 3 – Preise
 
-- [ ] Sicheren URL-Abruf implementieren
-- [ ] JSON-LD-Produktpreise extrahieren
-- [ ] Manuellen Ersatzpreis und Preisstatus umsetzen
+- [x] Sicheren URL-Abruf implementieren
+- [x] JSON-LD-Produktpreise und standardisierte Preis-Meta-Tags extrahieren
+- [x] Manuellen Ersatzpreis und Preisstatus umsetzen
 - [ ] Häufig verwendete Shops testen und priorisieren
 - [ ] Preisverlauf speichern
 - [ ] Tägliche Aktualisierung über Vercel Cron einrichten
@@ -51,8 +51,8 @@
 ## Abnahmekriterien für Version 1
 
 - Besucher können alle veröffentlichten Projekte ohne Anmeldung ansehen.
-- Projektkacheln zeigen korrekt Bild, Name und Gesamtkosten.
-- Die Detailansicht zeigt Beschreibung und vollständige Materialliste.
+- Projektkacheln zeigen korrekt Name, Gesamtkosten und das optionale Bild.
+- Die Detailansicht zeigt die optionale Beschreibung und die vollständige Materialliste.
 - Nur Eddi kann Inhalte verändern.
 - Ein kaputter oder blockierter Shop-Link macht das Projekt nicht unbenutzbar.
 - Jeder Preis zeigt Quelle und Zeitpunkt der letzten Prüfung.

@@ -13,8 +13,8 @@ Jedes Projekt liegt unter `projects/<slug>.json`. Bilddateien liegen getrennt un
 | `id` | UUID | Eindeutige ID |
 | `slug` | Text, eindeutig | Lesbarer Teil der Projekt-URL |
 | `name` | Text | Projektname |
-| `description` | Text | Ausführliche Beschreibung |
-| `image` | URL | Öffentliche URL zum Vorschaubild in Vercel Blob |
+| `description` | Text, optional leer | Ausführliche Beschreibung |
+| `image` | URL oder `null` | Optionale öffentliche URL zum Vorschaubild in Vercel Blob |
 | `status` | Text | Aktueller Projektstatus |
 | `createdAt` | Zeitstempel | Erstellung |
 
@@ -31,7 +31,7 @@ Die Gesamtsumme wird bevorzugt aus den Materialdaten berechnet. Falls sie späte
 | `unitLabel` | Text, optional | Stück, Meter, Packung usw. |
 | `unitPriceMinor` | Integer | Aktueller Einzelpreis in Cent |
 | `currency` | Text | ISO-Währung, zunächst `EUR` |
-| `priceStatus` | Enum | Aktuell `manual`, später zusätzlich `current` und `stale` |
+| `priceStatus` | Enum | `current` nach automatischer Prüfung oder `manual` als Ersatzpreis; später zusätzlich `stale` |
 | `lastCheckedLabel` | Text | Datum der letzten Preisangabe |
 | `sortOrder` | Integer | Reihenfolge innerhalb der Projektdatei |
 
