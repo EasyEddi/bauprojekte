@@ -56,7 +56,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 403 });
   }
 
-  const form = await request.formData();
+  let form: FormData;
+  try {
+    form = await request.formData();
+  } catch {
+    return NextResponse.json({ error: "Die Formulardaten konnten nicht gelesen werden." }, { status: 400 });
+  }
   const name = form.get("name");
   const description = form.get("description");
   const image = form.get("image");
@@ -75,6 +80,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bitte prüfe die Materialangaben." }, { status: 400 });
   }
 
-  const project = await saveProject({ name: name.trim(), description: description.trim(), image, materials });
-  return NextResponse.json({ slug: project.slug }, { status: 201 });
+  try {
+    const project = await saveProject({ name: name.trim(), description: description.trim(), image, materials });
+    return NextResponse.json({ slug: project.slug }, { status: 201 });
+  } catch (error) {
+    console.error("Projekt konnte nicht gespeichert werden:", error instanceof Error ? error.message : "Unbekannter Fehler");
+    return NextResponse.json({ error: "Das Projekt konnte nicht gespeichert werden. Bitte versuche es erneut." }, { status: 500 });
+  }
 }
