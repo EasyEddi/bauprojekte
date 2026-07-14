@@ -1,7 +1,7 @@
 export type ParsedPrice = {
   priceMinor: number;
   currency: "EUR";
-  source: "json-ld" | "meta";
+  source: "json-ld" | "meta" | "adapter";
 };
 
 function parseAmount(value: unknown) {

@@ -1,6 +1,7 @@
 import "server-only";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
+import { applyPriceAdapter } from "@/lib/price-adapters";
 import { extractProductPrice, type ParsedPrice } from "@/lib/price-parser";
 
 const maximumBytes = 8_000_000;
@@ -111,7 +112,7 @@ export async function fetchProductPrice(value: string): Promise<ParsedPrice> {
       if (!contentType.includes("html") && !contentType.includes("json")) throw new PriceFetchError("Der Link führt nicht zu einer lesbaren Produktseite.");
       const result = await readPriceLimited(response);
       if (!result) throw new PriceFetchError("Auf der Produktseite wurde kein maschinenlesbarer Euro-Preis gefunden.");
-      return result;
+      return applyPriceAdapter(result, url);
     }
     throw new PriceFetchError("Der Preis konnte nicht geladen werden.");
   } catch (error) {
