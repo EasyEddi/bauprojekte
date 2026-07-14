@@ -46,7 +46,7 @@ export function ProjectForm() {
   return (
     <form className="project-form" onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }}>
       <section className="form-section">
-        <div className="form-section-title"><span>01</span><div><h2>Das Projekt</h2><p>Name, Bild und die Idee dahinter.</p></div></div>
+        <div className="form-section-title"><h2>Projekt</h2></div>
         <div className="form-grid">
           <label className="field field-wide">
             <span>Projektname</span>
@@ -58,14 +58,14 @@ export function ProjectForm() {
           </label>
           <label className="image-upload field-wide">
             <ImagePlus size={28} aria-hidden="true" />
-            <span><strong>Vorschaubild auswählen</strong>JPG, PNG oder WebP · im Prototyp noch ohne Upload</span>
+            <span><strong>Vorschaubild auswählen</strong>JPG, PNG oder WebP</span>
             <input type="file" accept="image/png,image/jpeg,image/webp" disabled />
           </label>
         </div>
       </section>
 
       <section className="form-section">
-        <div className="form-section-title"><span>02</span><div><h2>Die Materialien</h2><p>Füge Links, Mengen und vorerst einen manuellen Preis hinzu.</p></div></div>
+        <div className="form-section-title"><h2>Materialien</h2></div>
         <div className="draft-materials">
           {materials.map((material, index) => (
             <div className="draft-material" key={material.id}>
@@ -95,7 +95,7 @@ export function ProjectForm() {
       {submitted && (
         <div className="form-success" role="status">
           <Check size={20} aria-hidden="true" />
-          <p><strong>Der Formularablauf funktioniert.</strong> Sobald Anmeldung und Datenbank verbunden sind, wird dieser Entwurf dauerhaft gespeichert.</p>
+          <p>Das Formular ist vollständig. Dauerhaftes Speichern folgt mit der Datenbank-Anbindung.</p>
         </div>
       )}
     </form>

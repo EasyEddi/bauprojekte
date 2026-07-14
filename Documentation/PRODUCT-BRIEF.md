@@ -69,7 +69,8 @@
 - Projektkacheln zeigen nur Bild, Name und Preis
 - Kartenraster auf Desktop, einspaltige Liste auf kleinen Smartphones
 - Gut erreichbares Plus als schwebende Aktion am unteren Rand
-- Zurückhaltende neutrale Farben und möglichst wenig visuelle Ablenkung
+- Ruhige Farbflächen in Hellgrün und Creme, dunkles Grün für Aktionen und ein sparsamer Terrakotta-Akzent
+- Einheitliche, weiche Karten für Übersicht und Formular; keine übergroßen Überschriften oder dekorativen Infoboxen
 
 ## Fachliche Regeln
 
