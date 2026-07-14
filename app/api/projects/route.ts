@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/admin-auth";
 import { saveProject } from "@/lib/project-store";
+import { hasValidRequestOrigin } from "@/lib/request-origin";
 
 type IncomingMaterial = {
   name?: unknown;
   productUrl?: unknown;
   quantity?: unknown;
   unitPriceMinor?: unknown;
+  priceStatus?: unknown;
 };
 
 function isAllowedImage(value: FormDataEntryValue | null): value is File {
@@ -38,11 +40,13 @@ function parseMaterials(raw: FormDataEntryValue | null) {
     if (!["http:", "https:"].includes(url.protocol)) return null;
     if (typeof value.quantity !== "number" || !Number.isFinite(value.quantity) || value.quantity <= 0 || value.quantity > 10000) return null;
     if (typeof value.unitPriceMinor !== "number" || !Number.isInteger(value.unitPriceMinor) || value.unitPriceMinor < 0 || value.unitPriceMinor > 100_000_000) return null;
+    if (!["current", "manual"].includes(String(value.priceStatus))) return null;
     return {
       name: value.name.trim(),
       productUrl: url.toString(),
       quantity: value.quantity,
       unitPriceMinor: value.unitPriceMinor,
+      priceStatus: value.priceStatus as "current" | "manual",
     };
   });
 
@@ -51,8 +55,7 @@ function parseMaterials(raw: FormDataEntryValue | null) {
 
 export async function POST(request: Request) {
   if (!await isAdmin()) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
-  const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) {
+  if (!hasValidRequestOrigin(request)) {
     return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 403 });
   }
 
@@ -70,10 +73,11 @@ export async function POST(request: Request) {
   if (typeof name !== "string" || name.trim().length < 2 || name.length > 120) {
     return NextResponse.json({ error: "Bitte gib einen gültigen Projektnamen ein." }, { status: 400 });
   }
-  if (typeof description !== "string" || description.trim().length < 2 || description.length > 5000) {
+  if (typeof description !== "string" || description.length > 5000) {
     return NextResponse.json({ error: "Bitte gib eine gültige Beschreibung ein." }, { status: 400 });
   }
-  if (!isAllowedImage(image)) {
+  const optionalImage = image instanceof File && image.size === 0 ? null : image;
+  if (optionalImage !== null && !isAllowedImage(optionalImage)) {
     return NextResponse.json({ error: "Bitte wähle ein JPG-, PNG- oder WebP-Bild bis 2 MB aus." }, { status: 400 });
   }
   if (!materials) {
@@ -81,7 +85,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const project = await saveProject({ name: name.trim(), description: description.trim(), image, materials });
+    const project = await saveProject({ name: name.trim(), description: description.trim(), image: optionalImage, materials });
     return NextResponse.json({ slug: project.slug }, { status: 201 });
   } catch (error) {
     console.error("Projekt konnte nicht gespeichert werden:", error instanceof Error ? error.message : "Unbekannter Fehler");

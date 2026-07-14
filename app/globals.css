@@ -335,6 +335,12 @@ body {
   background: #dfe9df;
 }
 
+.card-image-empty {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #dfe9df, #edf3ea);
+}
+
 .project-card:hover .card-image img {
   transform: none;
 }
@@ -428,6 +434,12 @@ body {
   letter-spacing: -.02em;
 }
 
+.field > span small {
+  color: #708176;
+  font-size: 11px;
+  font-weight: 500;
+}
+
 .field > span {
   color: #385344;
   font-size: 13px;
@@ -472,6 +484,82 @@ body {
 .draft-material-head > strong {
   color: #385344;
   letter-spacing: .06em;
+}
+
+.material-price-box {
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 12px;
+  color: #52695b;
+  background: #edf3eb;
+  border: 1px solid #ccd9ce;
+  border-radius: 9px;
+  font-size: 12px;
+}
+
+.material-price-box.is-current {
+  color: #28583e;
+  background: #e5f0e4;
+  border-color: #b8ceb9;
+}
+
+.material-price-box.is-current > span {
+  display: grid;
+  gap: 2px;
+}
+
+.material-price-box.is-current strong {
+  font-size: 17px;
+}
+
+.material-price-box.is-error,
+.material-price-box.is-manual {
+  display: block;
+  background: #f8f2ed;
+  border-color: #ddcabc;
+}
+
+.price-fallback {
+  display: grid;
+  gap: 9px;
+}
+
+.price-fallback > small {
+  color: #8a4d3a;
+  line-height: 1.35;
+}
+
+.price-retry {
+  width: max-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  color: #52695b;
+  background: transparent;
+  border: 0;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.spin {
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.detail-hero.no-image {
+  grid-template-columns: 1fr;
+  min-height: auto;
+}
+
+.detail-hero.no-image .detail-summary {
+  min-height: 380px;
 }
 
 .icon-button {
@@ -609,6 +697,10 @@ body {
 
   .form-section {
     padding: 22px 18px;
+  }
+
+  .material-price-box {
+    min-height: 58px;
   }
 
   .form-submit-bar {

@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
-  return project ? { title: project.name, description: project.summary } : {};
+  return project ? { title: project.name, description: project.summary || undefined } : {};
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
@@ -32,15 +32,15 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <ArrowLeft size={18} aria-hidden="true" /> Alle Projekte
         </Link>
 
-        <header className="detail-hero">
-          <div className="detail-image">
+        <header className={`detail-hero ${project.image ? "" : "no-image"}`}>
+          {project.image && <div className="detail-image">
             <Image src={project.image} alt={project.imageAlt} fill priority sizes="(max-width: 900px) 100vw, 60vw" />
             <span className="project-status">{project.status}</span>
-          </div>
+          </div>}
           <div className="detail-summary">
             <p className="eyebrow">Projektplan</p>
             <h1>{project.name}</h1>
-            <p>{project.summary}</p>
+            {project.summary && <p>{project.summary}</p>}
             <div className="detail-price">
               <span>Geschätzte Materialkosten</span>
               <strong>{formatPrice(total)}</strong>
@@ -54,13 +54,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </div>
         </header>
 
-        <section className="detail-description">
+        {project.description && <section className="detail-description">
           <div>
             <p className="eyebrow">Die Idee dahinter</p>
             <h2>Was ich bauen möchte</h2>
           </div>
           <p>{project.description}</p>
-        </section>
+        </section>}
 
         <section className="materials-section">
           <div className="section-heading materials-heading">

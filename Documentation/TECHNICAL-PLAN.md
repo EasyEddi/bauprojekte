@@ -39,16 +39,15 @@ Die Website ist lesend öffentlich. Das Plus bleibt sichtbar, führt für nicht 
 
 Produktseiten unterscheiden sich stark. Manche Shops liefern strukturierte Daten, manche rendern Preise mit JavaScript, verlangen Cookies, zeigen regionale Preise oder blockieren Bots. Außerdem können sich HTML-Strukturen jederzeit ändern. Darum wird die Funktion fehlertolerant gebaut.
 
-### Geplante Pipeline
+### Aktuelle Pipeline
 
 1. URL normalisieren und nur `http` beziehungsweise `https` erlauben.
 2. Serverseitig abrufen; private Netzwerkadressen und Weiterleitungen dorthin blockieren.
 3. JSON-LD vom Typ `Product` und `Offer` auslesen.
 4. Als zweite Stufe standardisierte Meta-Tags prüfen.
-5. Später für häufig genutzte Shops gezielte Adapter ergänzen.
-6. Preis, Währung, Verfügbarkeit, Quelle und Prüfzeit speichern.
-7. Bei Fehlern den letzten gültigen Preis behalten und den Fehlerstatus anzeigen.
-8. Falls noch kein Preis existiert, einen manuellen Preis verlangen.
+5. Den ermittelten Cent-Wert mit dem Preisstatus im Material speichern.
+6. Falls kein Preis gefunden wird, direkt im Formular einen manuellen Ersatzpreis anbieten.
+7. Später für häufig genutzte Shops gezielte Adapter ergänzen.
 
 ### Aktualisierungsrhythmus
 
@@ -80,9 +79,9 @@ Das ist „nahezu aktuell“, ohne Shops bei jedem Besuch unnötig anzufragen od
 
 1. Client sammelt Projektdaten und Materialien.
 2. Server validiert Anmeldung und Eingaben.
-3. Bild wird nach Typ- und Größenprüfung in Vercel Blob geladen.
+3. Ein optionales Bild wird nach Typ- und Größenprüfung in Vercel Blob geladen.
 4. Projekt und Materialien werden gemeinsam als eigene JSON-Datei gespeichert.
-5. Preisprüfungen werden angestoßen.
+5. Noch nicht abgerufene Preise werden vor dem Speichern geprüft.
 6. Der Server berechnet beziehungsweise liefert die neue Summe.
 
 ## Beobachtbarkeit und Fehlerbehandlung
