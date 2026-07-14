@@ -489,8 +489,17 @@ body {
   background: #eaf1e9;
 }
 
-.form-submit-bar {
+.form-submit-stack {
   bottom: 14px;
+  position: sticky;
+  padding: 15px 17px;
+  z-index: 10;
+  display: grid;
+  gap: 8px;
+}
+
+.form-submit-bar {
+  position: static;
   padding: 15px 17px;
   color: #1c3025;
   background: #ffffff;
@@ -603,6 +612,19 @@ body {
   }
 
   .form-submit-bar {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .form-submit-stack {
     bottom: 10px;
+    padding: 0;
+  }
+
+  .form-submit-bar .primary-button {
+    width: auto;
+    min-width: 140px;
+    padding: 0 14px;
+    font-size: 13px;
   }
 }
