@@ -4,23 +4,22 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, CalendarClock, CircleCheck, CircleDashed, Ruler, ShoppingBasket } from "lucide-react";
 import { notFound } from "next/navigation";
 import { FloatingAddButton } from "@/components/floating-add-button";
-import { formatPrice, getProjectBySlug, getProjectTotal, projects } from "@/lib/projects";
+import { getProjectBySlug } from "@/lib/project-store";
+import { formatPrice, getProjectTotal } from "@/lib/projects";
 
 type ProjectPageProps = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getProjectBySlug(slug);
   return project ? { title: project.name, description: project.summary } : {};
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getProjectBySlug(slug);
 
   if (!project) notFound();
 

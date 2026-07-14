@@ -17,7 +17,7 @@ Diese Datei ist vor jeder Änderung am Repository vollständig zu lesen.
 - TypeScript im strikten Modus verwenden.
 - Geldbeträge intern in Cent beziehungsweise kleinster Währungseinheit speichern.
 - Berechtigungen immer serverseitig und in der Datenbank erzwingen; UI-Verstecken ist kein Schutz.
-- Niemals Zugangsdaten, `.env`-Dateien, Tokens oder private Supabase-Schlüssel committen.
+- Niemals Zugangsdaten, `.env`-Dateien, Tokens oder private Storage-Schlüssel committen.
 - Externe URLs validieren und gegen SSRF absichern, bevor der Server sie abruft.
 - Keine fremden Skripte aus Produktseiten ausführen.
 - Preisparser als austauschbare Stufen beziehungsweise Adapter strukturieren.
@@ -41,4 +41,3 @@ Diese Datei ist vor jeder Änderung am Repository vollständig zu lesen.
 - Kommentare ohne Moderationskonzept
 - Browser-Automation zum Umgehen von Shop-Schutzmaßnahmen
 - Shop-spezifische Parser, bevor bekannt ist, welche Shops tatsächlich genutzt werden
-

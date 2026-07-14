@@ -8,9 +8,9 @@ Familie und Freunde können sehen, was als Nächstes gebaut werden soll, welche 
 
 ## Status
 
-Der öffentliche Frontend-Prototyp ist umgesetzt und über Vercel erreichbar. Die Startseite ist bewusst auf ein reines Kachelraster reduziert. Kacheln zeigen ausschließlich Bild, Projektname und Gesamtkosten. Platzhalterprojekte werden nicht veröffentlicht.
+Die öffentliche Anwendung ist über Vercel erreichbar. Die Startseite ist bewusst auf ein reines Kachelraster reduziert. Kacheln zeigen ausschließlich Bild, Projektname und Gesamtkosten. Platzhalterprojekte werden nicht veröffentlicht.
 
-Die Inhalte stammen aktuell noch aus lokalen Beispieldaten. Anmeldung, Datenbank, Bild-Upload und echte Preisabfragen folgen in der nächsten Ausbaustufe. Das Erstellen-Formular kennzeichnet diesen Zustand sichtbar und speichert noch keine öffentlichen Daten.
+Projekte und Bilder werden dauerhaft in Vercel Blob gespeichert. Das Erstellen-Formular ist serverseitig mit einem Admin-Passwort geschützt; gespeicherte Projekte erscheinen anschließend öffentlich in Übersicht und Detailansicht. Automatische Preisabfragen folgen in einer späteren Ausbaustufe, aktuell wird der Preis manuell eingetragen.
 
 ## Geplanter Funktionsumfang
 
@@ -34,7 +34,8 @@ Die Inhalte stammen aktuell noch aus lokalen Beispieldaten. Anmeldung, Datenbank
 
 - Next.js mit TypeScript
 - Tailwind CSS
-- Supabase für Datenbank, Anmeldung und Bildspeicher
+- Vercel Blob für dauerhaft gespeicherte Projekte und Bilder
+- Serverseitig geschützter Admin-Zugang über ein Vercel-Secret
 - Vercel für Hosting, Serverfunktionen und geplante Preisprüfungen
 
 ## Lokal starten
@@ -45,6 +46,8 @@ Voraussetzung ist eine aktuelle Node.js-Version mit pnpm.
 pnpm install
 pnpm dev
 ```
+
+Für lokales Speichern werden `BLOB_READ_WRITE_TOKEN` und `ADMIN_PASSWORD` in einer nicht eingecheckten `.env.local` benötigt.
 
 Die Produktionsprüfung läuft mit:
 

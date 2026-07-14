@@ -455,6 +455,7 @@ body {
   background: #eef4ed;
   border: 1px dashed #9db3a2;
   border-radius: 12px;
+  cursor: pointer;
 }
 
 .image-upload svg {
@@ -520,6 +521,35 @@ body {
 .primary-button:hover {
   color: #ffffff;
   background: #b86645;
+}
+
+.primary-button:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+.admin-login {
+  max-width: 520px;
+  display: grid;
+  gap: 18px;
+  padding: 30px;
+  background: #ffffff;
+  border: 1px solid #d6e0d7;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgb(37 73 52 / 6%);
+}
+
+.admin-login .primary-button {
+  justify-self: start;
+}
+
+.form-error {
+  margin: 0;
+  padding: 13px 15px;
+  color: #7c352a;
+  background: #f9e9e4;
+  border: 1px solid #e4bdb1;
+  border-radius: 9px;
 }
 
 .form-success {

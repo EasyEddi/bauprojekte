@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Check, ImagePlus, Link2, Plus, Trash2 } from "lucide-react";
 import { formatPrice } from "@/lib/projects";
 
@@ -21,8 +22,11 @@ function euroInputToMinor(value: string) {
 }
 
 export function ProjectForm() {
+  const router = useRouter();
   const [materials, setMaterials] = useState<DraftMaterial[]>([emptyMaterial(1)]);
-  const [submitted, setSubmitted] = useState(false);
+  const [imageName, setImageName] = useState("");
+  const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
 
   const total = useMemo(
     () => materials.reduce((sum, material) => sum + euroInputToMinor(material.priceEuro) * Math.max(0, material.quantity), 0),
@@ -30,7 +34,7 @@ export function ProjectForm() {
   );
 
   function updateMaterial(id: number, patch: Partial<DraftMaterial>) {
-    setSubmitted(false);
+    setError("");
     setMaterials((current) => current.map((material) => material.id === id ? { ...material, ...patch } : material));
   }
 
@@ -43,23 +47,46 @@ export function ProjectForm() {
     setMaterials((current) => current.length === 1 ? [emptyMaterial(1)] : current.filter((material) => material.id !== id));
   }
 
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPending(true);
+    setError("");
+    const form = new FormData(event.currentTarget);
+    form.set("materials", JSON.stringify(materials.map((material) => ({
+      name: material.name,
+      productUrl: material.url,
+      quantity: material.quantity,
+      unitPriceMinor: euroInputToMinor(material.priceEuro),
+    }))));
+
+    const response = await fetch("/api/projects", { method: "POST", body: form });
+    const result = await response.json() as { error?: string; slug?: string };
+    if (!response.ok || !result.slug) {
+      setPending(false);
+      setError(result.error ?? "Das Projekt konnte nicht gespeichert werden.");
+      return;
+    }
+    router.push(`/projekte/${result.slug}`);
+    router.refresh();
+  }
+
   return (
-    <form className="project-form" onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }}>
+    <form className="project-form" onSubmit={submit}>
       <section className="form-section">
         <div className="form-section-title"><h2>Projekt</h2></div>
         <div className="form-grid">
           <label className="field field-wide">
             <span>Projektname</span>
-            <input required name="name" placeholder="z. B. Eine eigene Gartenbank" onChange={() => setSubmitted(false)} />
+            <input required name="name" maxLength={120} placeholder="z. B. Eine eigene Gartenbank" onChange={() => setError("")} />
           </label>
           <label className="field field-wide">
             <span>Beschreibung</span>
-            <textarea required name="description" rows={5} placeholder="Was möchtest du bauen und wofür soll es später da sein?" onChange={() => setSubmitted(false)} />
+            <textarea required name="description" maxLength={5000} rows={5} placeholder="Was möchtest du bauen und wofür soll es später da sein?" onChange={() => setError("")} />
           </label>
           <label className="image-upload field-wide">
             <ImagePlus size={28} aria-hidden="true" />
-            <span><strong>Vorschaubild auswählen</strong>JPG, PNG oder WebP</span>
-            <input type="file" accept="image/png,image/jpeg,image/webp" disabled />
+            <span><strong>{imageName || "Vorschaubild auswählen"}</strong>JPG, PNG oder WebP · maximal 2 MB</span>
+            <input name="image" type="file" accept="image/png,image/jpeg,image/webp" required onChange={(event) => setImageName(event.target.files?.[0]?.name ?? "")} />
           </label>
         </div>
       </section>
@@ -89,15 +116,10 @@ export function ProjectForm() {
 
       <div className="form-submit-bar">
         <div><span>Aktuelle Materialsumme</span><strong>{formatPrice(total)}</strong></div>
-        <button className="primary-button" type="submit">Entwurf prüfen <Check size={18} /></button>
+        <button className="primary-button" type="submit" disabled={pending}>{pending ? "Speichert …" : "Projekt speichern"} <Check size={18} /></button>
       </div>
 
-      {submitted && (
-        <div className="form-success" role="status">
-          <Check size={20} aria-hidden="true" />
-          <p>Das Formular ist vollständig. Dauerhaftes Speichern folgt mit der Datenbank-Anbindung.</p>
-        </div>
-      )}
+      {error && <p className="form-error" role="alert">{error}</p>}
     </form>
   );
 }
