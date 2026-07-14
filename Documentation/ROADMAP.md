@@ -16,17 +16,17 @@
 - [x] Projektdetailseite umsetzen
 - [x] Materialliste und korrekte Summenberechnung umsetzen
 - [x] Leere und nicht gefundene Zustände gestalten
-- [x] Interaktiven, noch nicht persistenten Erstellen-Prototyp umsetzen
+- [x] Interaktives Erstellen-Formular umsetzen
 - [x] Erste visuelle Abnahme auf Smartphone und Desktop
 
 ## Phase 2 – Daten und Verwaltung
 
-- [ ] Supabase-Projekt verbinden
-- [ ] Datenbanktabellen und Row Level Security anlegen
-- [ ] Admin-Anmeldung einrichten
-- [ ] Geschütztes Formular hinter dem Plus umsetzen
-- [ ] Projektbilder hochladen
-- [ ] Projekte und Materialien erstellen, bearbeiten und löschen
+- [x] Vercel Blob mit dem Projekt verbinden
+- [x] Projekte und Materialien dauerhaft speichern
+- [x] Admin-Anmeldung einrichten
+- [x] Geschütztes Formular hinter dem Plus umsetzen
+- [x] Projektbilder hochladen
+- [ ] Projekte und Materialien bearbeiten und löschen
 - [ ] Entwurf und Veröffentlichung unterstützen
 
 ## Phase 3 – Preise
@@ -42,8 +42,8 @@
 ## Phase 4 – Veröffentlichung
 
 - [x] Vercel-Projekt mit GitHub verbinden
-- [ ] Umgebungsvariablen hinterlegen
-- [ ] Produktionsdatenbank und Storage vorbereiten
+- [x] Umgebungsvariablen hinterlegen
+- [x] Produktions-Storage vorbereiten
 - [ ] Sicherheits- und Berechtigungsprüfung durchführen
 - [ ] Performance und mobile Bedienung prüfen
 - [x] Öffentliche Domain unter `bauprojekte.vercel.app` veröffentlichen

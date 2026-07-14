@@ -16,6 +16,7 @@ export type Material = {
 export type Project = {
   id: string;
   slug: string;
+  createdAt: string;
   name: string;
   summary: string;
   description: string;
@@ -27,14 +28,8 @@ export type Project = {
   materials: Material[];
 };
 
-export const projects: Project[] = [];
-
 export function getProjectTotal(project: Project) {
   return project.materials.reduce((sum, material) => sum + material.quantity * material.unitPriceMinor, 0);
-}
-
-export function getProjectBySlug(slug: string) {
-  return projects.find((project) => project.slug === slug);
 }
 
 export function formatPrice(priceMinor: number, currency = "EUR") {

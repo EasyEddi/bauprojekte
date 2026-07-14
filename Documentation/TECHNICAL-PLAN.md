@@ -2,7 +2,7 @@
 
 ## Architekturentscheidung
 
-Die Website wird als Next.js-Anwendung mit TypeScript umgesetzt und auf Vercel bereitgestellt. Supabase übernimmt PostgreSQL-Datenbank, Anmeldung und Bildspeicher. Diese Trennung hält die Website einfach deploybar und ermöglicht trotzdem dauerhafte, gemeinsam genutzte Daten.
+Die Website wird als Next.js-Anwendung mit TypeScript umgesetzt und auf Vercel bereitgestellt. Vercel Blob speichert jedes Projekt als eigene JSON-Datei und die zugehörigen Vorschaubilder. Für die kleine, von einem einzelnen Admin verwaltete Familienseite ist das einfacher als eine relationale Datenbank und trotzdem dauerhaft sowie geräteübergreifend.
 
 ## Komponenten
 
@@ -18,9 +18,8 @@ Die Website wird als Next.js-Anwendung mit TypeScript umgesetzt und auf Vercel b
 
 - Next.js Server Actions oder Route Handler für Schreibvorgänge
 - Serverseitige Prüfung jeder Verwalter-Sitzung
-- Supabase PostgreSQL als dauerhafte Datenquelle
-- Supabase Storage für Projektbilder
-- Eingabeprüfung mit Zod
+- Vercel Blob als dauerhafte Datenquelle für Projekt-JSON und Bilder
+- Serverseitige Eingabeprüfung vor jedem Schreibzugriff
 
 ### Veröffentlichung
 
@@ -32,9 +31,7 @@ Die Website wird als Next.js-Anwendung mit TypeScript umgesetzt und auf Vercel b
 
 ## Zugriffsschutz
 
-Die Website ist lesend öffentlich. Das Plus darf sichtbar sein, führt für nicht angemeldete Besucher aber zur Anmeldung. Erstellen, Bearbeiten, Löschen, Bild-Uploads und Preisaktualisierungen werden zusätzlich auf dem Server geschützt. Eine nur im Browser versteckte Schaltfläche reicht nicht aus.
-
-Für Version 1 ist Supabase Auth mit E-Mail-Magic-Link oder E-Mail/Passwort vorgesehen. Zusätzlich wird eine feste Admin-E-Mail als Umgebungsvariable geprüft. Row Level Security erlaubt öffentliche Lesezugriffe nur auf veröffentlichte Projekte und Schreibzugriffe nur für den Admin.
+Die Website ist lesend öffentlich. Das Plus bleibt sichtbar, führt für nicht angemeldete Besucher aber zur Passwort-Anmeldung. Das Passwort liegt ausschließlich als Vercel-Umgebungsvariable vor. Nach erfolgreicher Prüfung setzt der Server ein signiertes, `HttpOnly`, `SameSite=Strict`-Cookie. Der Projekt-Endpunkt prüft diese Sitzung erneut; ein nur im Browser verstecktes Formular wäre kein Schutz.
 
 ## Preisermittlung
 
@@ -74,7 +71,7 @@ Das ist „nahezu aktuell“, ohne Shops bei jedem Besuch unnötig anzufragen od
 
 ### Öffentliche Seite
 
-1. Server lädt veröffentlichte Projekte aus Supabase.
+1. Server listet gespeicherte Projektdateien aus Vercel Blob.
 2. Gespeicherte Preise werden sofort angezeigt.
 3. Veraltete Werte sind mit dem Zeitpunkt der letzten Prüfung versehen.
 4. Eine Preisprüfung läuft unabhängig und aktualisiert anschließend die Daten.
@@ -83,8 +80,8 @@ Das ist „nahezu aktuell“, ohne Shops bei jedem Besuch unnötig anzufragen od
 
 1. Client sammelt Projektdaten und Materialien.
 2. Server validiert Anmeldung und Eingaben.
-3. Bild wird in einen eingeschränkten Storage-Bucket geladen.
-4. Projekt und Materialien werden transaktional gespeichert.
+3. Bild wird nach Typ- und Größenprüfung in Vercel Blob geladen.
+4. Projekt und Materialien werden gemeinsam als eigene JSON-Datei gespeichert.
 5. Preisprüfungen werden angestoßen.
 6. Der Server berechnet beziehungsweise liefert die neue Summe.
 
@@ -97,7 +94,5 @@ Das ist „nahezu aktuell“, ohne Shops bei jedem Besuch unnötig anzufragen od
 
 ## Offene Entscheidungen vor der Implementierung
 
-- Magic Link oder Passwort für die Admin-Anmeldung
-- Supabase oder alternativ Vercel Postgres plus Blob
 - Welche Shops zuerst zuverlässig unterstützt werden müssen
 - Ob der Preisverlauf bereits in Version 1 sichtbar sein soll

@@ -2,7 +2,11 @@
 
 Alle Geldwerte werden als Ganzzahl in der kleinsten Währungseinheit gespeichert, bei Euro also in Cent. Dadurch entstehen keine Rundungsfehler durch Fließkommazahlen.
 
-## `projects`
+## Projektdatei in Vercel Blob
+
+Jedes Projekt liegt unter `projects/<slug>.json`. Bilddateien liegen getrennt unter `images/<slug>.<endung>`. Dadurch kann ein Projekt unabhängig gelesen oder später ersetzt werden, ohne eine gemeinsame JSON-Datei konkurrierend zu überschreiben.
+
+### Projektfelder
 
 | Feld | Typ | Bedeutung |
 | --- | --- | --- |
@@ -10,37 +14,30 @@ Alle Geldwerte werden als Ganzzahl in der kleinsten Währungseinheit gespeichert
 | `slug` | Text, eindeutig | Lesbarer Teil der Projekt-URL |
 | `name` | Text | Projektname |
 | `description` | Text | Ausführliche Beschreibung |
-| `image_path` | Text | Pfad zum Vorschaubild im Storage |
-| `status` | Enum | `draft`, `published`, später weitere Zustände |
-| `created_at` | Zeitstempel | Erstellung |
-| `updated_at` | Zeitstempel | Letzte Änderung |
-| `published_at` | Zeitstempel, optional | Veröffentlichung |
+| `image` | URL | Öffentliche URL zum Vorschaubild in Vercel Blob |
+| `status` | Text | Aktueller Projektstatus |
+| `createdAt` | Zeitstempel | Erstellung |
 
 Die Gesamtsumme wird bevorzugt aus den Materialdaten berechnet. Falls sie später für schnellere Übersichten zwischengespeichert wird, muss die Datenbank sie bei jeder Materialänderung neu berechnen.
 
-## `materials`
+### Eingebettete Materialien
 
 | Feld | Typ | Bedeutung |
 | --- | --- | --- |
 | `id` | UUID | Eindeutige ID |
-| `project_id` | UUID | Zugehöriges Projekt |
 | `name` | Text | Anzeigename des Materials |
-| `product_url` | Text | Link zum Produkt |
+| `productUrl` | Text | Link zum Produkt |
 | `quantity` | Dezimalzahl | Benötigte Menge |
-| `unit_label` | Text, optional | Stück, Meter, Packung usw. |
-| `current_unit_price_minor` | Integer, optional | Aktueller Einzelpreis in Cent |
+| `unitLabel` | Text, optional | Stück, Meter, Packung usw. |
+| `unitPriceMinor` | Integer | Aktueller Einzelpreis in Cent |
 | `currency` | Text | ISO-Währung, zunächst `EUR` |
-| `price_source` | Enum | `automatic` oder `manual` |
-| `price_status` | Enum | `current`, `stale`, `failed`, `pending` |
-| `last_checked_at` | Zeitstempel, optional | Letzte automatische Prüfung |
-| `last_error_code` | Text, optional | Maschinenlesbarer Fehlergrund |
-| `sort_order` | Integer | Reihenfolge in der Liste |
-| `created_at` | Zeitstempel | Erstellung |
-| `updated_at` | Zeitstempel | Letzte Änderung |
+| `priceStatus` | Enum | Aktuell `manual`, später zusätzlich `current` und `stale` |
+| `lastCheckedLabel` | Text | Datum der letzten Preisangabe |
+| `sortOrder` | Integer | Reihenfolge innerhalb der Projektdatei |
 
-## `price_history`
+## Später: Preisverlauf
 
-Diese Tabelle ist für Rabatt- und Preisänderungsanzeigen sinnvoll und kann bereits im MVP angelegt werden, auch wenn die Oberfläche sie noch nicht vollständig zeigt.
+Eine getrennte Datenbank oder zusätzliche Verlaufsdateien werden erst mit der automatischen Preisprüfung benötigt.
 
 | Feld | Typ | Bedeutung |
 | --- | --- | --- |
@@ -63,9 +60,7 @@ Die Oberfläche formatiert Cent-Werte erst bei der Anzeige. Bei Dezimalmengen mu
 
 ## Zugriffsregeln
 
-- Anonyme Nutzer dürfen `published`-Projekte und deren Materialien lesen.
-- Entwürfe sind nur für den Admin lesbar.
+- Anonyme Nutzer dürfen gespeicherte Projekte, Materialien und öffentliche Bilder lesen.
 - Nur der Admin darf Projekte, Materialien und Bilder ändern.
 - Preisprüfungen schreiben ausschließlich über vertrauenswürdigen Servercode.
 - Preisfehler enthalten keine vollständigen fremden HTML-Antworten oder Geheimnisse.
-
