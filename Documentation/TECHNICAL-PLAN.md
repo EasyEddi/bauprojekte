@@ -28,6 +28,7 @@ Die Website wird als Next.js-Anwendung mit TypeScript umgesetzt und auf Vercel b
 - Vercel-Projekt mit automatischem Deployment von `main`
 - Preview-Deployments für spätere Feature-Branches
 - Umgebungsvariablen ausschließlich in Vercel und lokal in einer nicht versionierten `.env.local`
+- Produktionsdomain: `https://bauprojekte.vercel.app`
 
 ## Zugriffsschutz
 
@@ -96,9 +97,7 @@ Das ist „nahezu aktuell“, ohne Shops bei jedem Besuch unnötig anzufragen od
 
 ## Offene Entscheidungen vor der Implementierung
 
-- Endgültiger Projektname und gewünschte Vercel-Domain
 - Magic Link oder Passwort für die Admin-Anmeldung
 - Supabase oder alternativ Vercel Postgres plus Blob
 - Welche Shops zuerst zuverlässig unterstützt werden müssen
 - Ob der Preisverlauf bereits in Version 1 sichtbar sein soll
-

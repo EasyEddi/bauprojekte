@@ -41,12 +41,12 @@
 
 ## Phase 4 – Veröffentlichung
 
-- [ ] Vercel-Projekt mit GitHub verbinden
+- [x] Vercel-Projekt mit GitHub verbinden
 - [ ] Umgebungsvariablen hinterlegen
 - [ ] Produktionsdatenbank und Storage vorbereiten
 - [ ] Sicherheits- und Berechtigungsprüfung durchführen
 - [ ] Performance und mobile Bedienung prüfen
-- [ ] Öffentliche Domain veröffentlichen
+- [x] Öffentliche Domain unter `bauprojekte.vercel.app` veröffentlichen
 
 ## Abnahmekriterien für Version 1
 

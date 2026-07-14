@@ -2,11 +2,13 @@
 
 Eine öffentliche Projektübersicht für Bauideen, Materiallisten und aktuelle geschätzte Gesamtkosten.
 
+**Live:** [bauprojekte.vercel.app](https://bauprojekte.vercel.app)
+
 Familie und Freunde können sehen, was als Nächstes gebaut werden soll, welche Materialien dafür fehlen und wie viel das Projekt voraussichtlich kostet. Projekte werden in einer Kachelübersicht dargestellt und besitzen eine eigene Detailansicht.
 
 ## Status
 
-Der öffentliche Frontend-Prototyp ist umgesetzt und produktionsfähig baubar. Er enthält die responsive Projektübersicht, statisch generierte Detailseiten, Beispielmaterialien mit korrekten Summen sowie den interaktiven Entwurf für das Erstellen neuer Projekte.
+Der öffentliche Frontend-Prototyp ist umgesetzt und über Vercel erreichbar. Er enthält die responsive Projektübersicht, statisch generierte Detailseiten, Beispielmaterialien mit korrekten Summen sowie den interaktiven Entwurf für das Erstellen neuer Projekte.
 
 Die Inhalte stammen aktuell noch aus lokalen Beispieldaten. Anmeldung, Datenbank, Bild-Upload und echte Preisabfragen folgen in der nächsten Ausbaustufe. Das Erstellen-Formular kennzeichnet diesen Zustand sichtbar und speichert noch keine öffentlichen Daten.
 
