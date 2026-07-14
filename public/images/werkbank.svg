@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
-  <title id="title">Mobile Werkbank</title><desc id="desc">Eine hölzerne Werkbank auf einer grünen Wiese</desc>
-  <rect width="1200" height="900" fill="#d9dfcb"/><path d="M0 590Q270 510 535 588T1200 570V900H0Z" fill="#88a36d"/><circle cx="1000" cy="150" r="78" fill="#f0c96b" opacity=".85"/>
-  <g fill="#557b55"><path d="M85 590 190 255l96 335Z"/><path d="m175 590 150-430 140 430Z"/><path d="m965 600 90-315 100 315Z"/></g>
-  <g stroke="#3c392f" stroke-width="13" stroke-linejoin="round"><path d="M315 445h610l-40 105H340Z" fill="#c38b55"/><path d="m372 550-30 245h75l38-245M835 550l40 245h-75l-48-245" fill="#9c6943"/><path d="M440 625h350v104H420Z" fill="#b47b4c"/></g>
-  <g fill="#303e34"><circle cx="362" cy="812" r="30"/><circle cx="858" cy="812" r="30"/></g>
-  <path d="m513 445 35-100h132l40 100" fill="none" stroke="#465d4b" stroke-width="18"/><path d="M567 348h95v70h-95Z" fill="#d66f48" stroke="#3c392f" stroke-width="10"/>
-  <g fill="#f5f1e7" opacity=".55"><circle cx="112" cy="112" r="5"/><circle cx="145" cy="98" r="8"/><circle cx="1058" cy="289" r="7"/></g>
-</svg>

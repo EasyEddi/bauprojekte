@@ -11,7 +11,7 @@
 ## Phase 1 – Öffentlicher Prototyp
 
 - [x] Next.js-Projekt mit TypeScript und Tailwind anlegen
-- [x] Beispieldaten lokal hinterlegen
+- [x] Leeren Ausgangszustand ohne öffentliche Platzhalterprojekte anlegen
 - [x] Responsive Kachelübersicht umsetzen
 - [x] Projektdetailseite umsetzen
 - [x] Materialliste und korrekte Summenberechnung umsetzen

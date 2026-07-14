@@ -8,7 +8,7 @@ Familie und Freunde können sehen, was als Nächstes gebaut werden soll, welche 
 
 ## Status
 
-Der öffentliche Frontend-Prototyp ist umgesetzt und über Vercel erreichbar. Er enthält die responsive Projektübersicht, statisch generierte Detailseiten, Beispielmaterialien mit korrekten Summen sowie den interaktiven Entwurf für das Erstellen neuer Projekte.
+Der öffentliche Frontend-Prototyp ist umgesetzt und über Vercel erreichbar. Die Startseite ist bewusst auf ein reines Kachelraster reduziert. Kacheln zeigen ausschließlich Bild, Projektname und Gesamtkosten. Platzhalterprojekte werden nicht veröffentlicht.
 
 Die Inhalte stammen aktuell noch aus lokalen Beispieldaten. Anmeldung, Datenbank, Bild-Upload und echte Preisabfragen folgen in der nächsten Ausbaustufe. Das Erstellen-Formular kennzeichnet diesen Zustand sichtbar und speichert noch keine öffentlichen Daten.
 
