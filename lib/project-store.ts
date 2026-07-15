@@ -1,8 +1,9 @@
 import "server-only";
 
 import { del, list, put } from "@vercel/blob";
+import { fetchProductPrice } from "@/lib/price-fetcher";
 import type { ProjectInput, ProjectMaterialInput } from "@/lib/project-input";
-import type { Material, Project } from "@/lib/projects";
+import { formatCheckedDate, type Material, type Project } from "@/lib/projects";
 
 const projectPrefix = "projects/";
 
@@ -52,6 +53,7 @@ async function uploadImage(slug: string, image: File) {
 function projectMaterials(input: ProjectMaterialInput[], now: Date, existing: Project | null): Material[] {
   return input.map((material, index) => {
     const previous = material.id ? existing?.materials.find((entry) => entry.id === material.id) : undefined;
+    const lastCheckedAt = material.lastCheckedAt ?? previous?.lastCheckedAt ?? (previous ? undefined : now.toISOString());
     return {
       id: previous?.id ?? crypto.randomUUID(),
       name: material.name,
@@ -61,10 +63,64 @@ function projectMaterials(input: ProjectMaterialInput[], now: Date, existing: Pr
       unitPriceMinor: material.unitPriceMinor,
       currency: "EUR",
       priceStatus: material.priceStatus,
-      lastCheckedLabel: now.toLocaleDateString("de-DE"),
+      priceSource: material.priceSource ?? previous?.priceSource ?? (material.priceStatus === "manual" ? "manual" : undefined),
+      lastCheckedAt,
+      lastCheckedLabel: lastCheckedAt
+        ? formatCheckedDate(new Date(lastCheckedAt))
+        : previous?.lastCheckedLabel ?? formatCheckedDate(now),
       sortOrder: index + 1,
     };
   });
+}
+
+async function writeProject(project: Project) {
+  await put(`${projectPrefix}${project.slug}.json`, JSON.stringify(project), {
+    access: "public",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: "application/json; charset=utf-8",
+  });
+}
+
+export async function refreshProjectPrices(project: Project): Promise<Project> {
+  const checkedAt = new Date();
+  let changed = false;
+
+  const materials = await Promise.all(project.materials.map(async (material) => {
+    const source = material.priceSource ?? (material.priceStatus === "manual" ? "manual" : undefined);
+    if (source === "browser" || source === "manual") {
+      if (material.priceSource) return material;
+      changed = true;
+      return { ...material, priceSource: source };
+    }
+
+    try {
+      const result = await fetchProductPrice(material.productUrl);
+      changed = true;
+      return {
+        ...material,
+        unitPriceMinor: result.priceMinor,
+        currency: "EUR" as const,
+        priceStatus: "current" as const,
+        priceSource: "server" as const,
+        lastCheckedAt: checkedAt.toISOString(),
+        lastCheckedLabel: formatCheckedDate(checkedAt),
+      };
+    } catch {
+      if (!material.priceSource) {
+        changed = true;
+        return { ...material, priceSource: "browser" as const };
+      }
+      if (material.priceStatus === "stale") return material;
+      changed = true;
+      return { ...material, priceStatus: "stale" as const };
+    }
+  }));
+
+  if (!changed) return project;
+  const updated = { ...project, materials };
+  await writeProject(updated);
+  return updated;
 }
 
 export async function saveProject(input: ProjectInput): Promise<Project> {
@@ -86,12 +142,7 @@ export async function saveProject(input: ProjectInput): Promise<Project> {
     materials: projectMaterials(input.materials, now, null),
   };
 
-  await put(`${projectPrefix}${slug}.json`, JSON.stringify(project), {
-    access: "public",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    contentType: "application/json; charset=utf-8",
-  });
+  await writeProject(project);
 
   return project;
 }
@@ -121,12 +172,7 @@ export async function updateProject(slug: string, input: ProjectInput): Promise<
     materials: projectMaterials(input.materials, now, existing),
   };
 
-  await put(`${projectPrefix}${slug}.json`, JSON.stringify(project), {
-    access: "public",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    contentType: "application/json; charset=utf-8",
-  });
+  await writeProject(project);
 
   return project;
 }

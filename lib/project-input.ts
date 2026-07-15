@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { PriceStatus } from "@/lib/projects";
+import type { PriceSource, PriceStatus } from "@/lib/projects";
 
 export type ProjectMaterialInput = {
   id?: string;
@@ -9,6 +9,8 @@ export type ProjectMaterialInput = {
   quantity: number;
   unitPriceMinor: number;
   priceStatus: Extract<PriceStatus, "current" | "manual">;
+  priceSource?: PriceSource;
+  lastCheckedAt?: string;
 };
 
 export type ProjectInput = {
@@ -26,6 +28,8 @@ type IncomingMaterial = {
   quantity?: unknown;
   unitPriceMinor?: unknown;
   priceStatus?: unknown;
+  priceSource?: unknown;
+  lastCheckedAt?: unknown;
 };
 
 export type ProjectInputResult =
@@ -62,6 +66,10 @@ function parseMaterials(raw: FormDataEntryValue | null): ProjectMaterialInput[] 
     if (typeof value.quantity !== "number" || !Number.isFinite(value.quantity) || value.quantity <= 0 || value.quantity > 10000) return null;
     if (typeof value.unitPriceMinor !== "number" || !Number.isInteger(value.unitPriceMinor) || value.unitPriceMinor < 0 || value.unitPriceMinor > 100_000_000) return null;
     if (!["current", "manual"].includes(String(value.priceStatus))) return null;
+    if (value.priceSource !== undefined && !["server", "browser", "manual"].includes(String(value.priceSource))) return null;
+    const checkedAt = typeof value.lastCheckedAt === "string" && Number.isFinite(Date.parse(value.lastCheckedAt))
+      ? new Date(value.lastCheckedAt).toISOString()
+      : undefined;
     return {
       id: typeof value.id === "string" && value.id.length <= 100 ? value.id : undefined,
       name: value.name.trim(),
@@ -69,6 +77,8 @@ function parseMaterials(raw: FormDataEntryValue | null): ProjectMaterialInput[] 
       quantity: value.quantity,
       unitPriceMinor: value.unitPriceMinor,
       priceStatus: value.priceStatus as "current" | "manual",
+      priceSource: value.priceSource as PriceSource | undefined,
+      lastCheckedAt: checkedAt,
     };
   });
 

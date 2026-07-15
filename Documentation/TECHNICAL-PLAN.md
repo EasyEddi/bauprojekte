@@ -49,7 +49,7 @@ Produktseiten unterscheiden sich stark. Manche Shops liefern strukturierte Daten
 4. Als zweite Stufe standardisierte Meta-Tags prüfen.
 5. Als allgemeine dritte Stufe semantische HTML-Preismarkierungen sammeln und bewerten; alte Preise, UVP und uneindeutige Kandidaten nicht automatisch übernehmen.
 6. Bekannte Shop-Konfigurationen über kleine, getrennte Adapter berücksichtigen; aktuell wird die im Stofferia-Link gespeicherte Stofflänge auf den Meterpreis angewendet.
-7. Den ermittelten Cent-Wert mit dem Preisstatus im Material speichern.
+7. Den ermittelten Cent-Wert zusammen mit Preisquelle, Preisstatus und Prüfzeitpunkt im Material speichern.
 8. Falls kein Preis gefunden wird, direkt im Formular einen manuellen Ersatzpreis anbieten.
 9. Bei Shop-Schutzseiten kann der Admin optional die lokale Opera-GX-Erweiterung „Bauprojekte Preishelfer“ installieren. Sie hat nur `activeTab` und `scripting`, liest eine Produktseite erst nach einem bewussten Klick und übergibt Produktname, Link und Cent-Wert an den Projekteditor. Der Import funktioniert sowohl direkt von einer Produktseite als auch mit einem bereits geöffneten Material im Formular. Dadurch bleibt er auch bei Seiten nutzbar, deren Content Security Policy Lesezeichen-Skripte blockiert.
 10. Später für weitere häufig genutzte Shops gezielte Adapter ergänzen.
@@ -57,7 +57,8 @@ Produktseiten unterscheiden sich stark. Manche Shops liefern strukturierte Daten
 ### Aktualisierungsrhythmus
 
 - Beim Hinzufügen eines Materials: sofortiger Versuch
-- Beim Öffnen einer Projektseite: nur aktualisieren, wenn der Preis deutlich veraltet ist; nicht jeden Seitenaufruf blockieren
+- Beim Öffnen einer Projektseite: alle serverlesbaren Produktlinks parallel neu prüfen und erfolgreiche Preise direkt speichern
+- Browser-Erweiterungs- und manuelle Preise: niemals serverseitig neu prüfen; ein Erweiterungspreis gilt nur am Erfassungstag als synchron
 - Geplant: täglicher Vercel-Cronjob für veröffentlichte Projekte
 - Manuell: Admin kann eine Aktualisierung anstoßen
 
@@ -77,8 +78,8 @@ Das ist „nahezu aktuell“, ohne Shops bei jedem Besuch unnötig anzufragen od
 
 1. Server listet gespeicherte Projektdateien aus Vercel Blob.
 2. Gespeicherte Preise werden sofort angezeigt.
-3. Veraltete Werte sind mit dem Zeitpunkt der letzten Prüfung versehen.
-4. Eine Preisprüfung läuft unabhängig und aktualisiert anschließend die Daten.
+3. Serverlesbare Preise werden parallel neu geprüft und vor der Ausgabe gespeichert.
+4. Die Oberfläche zeigt `synced` für aktuell servergeprüfte Preise, `synced · Stand <Datum>` für einen heute importierten Browserpreis und sonst `unsynced · Stand <Datum>`.
 
 ### Neues Projekt
 
