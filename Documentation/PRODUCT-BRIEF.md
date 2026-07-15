@@ -70,6 +70,7 @@
 - Kartenraster auf Desktop, einspaltige Liste auf kleinen Smartphones
 - Gut erreichbares Plus als schwebende Aktion am unteren Rand
 - Ruhige Farbflächen in Hellgrün und Creme, dunkles Grün für Aktionen und ein sparsamer Terrakotta-Akzent
+- Dark Mode ist der Standard; ein Umschalter links oben aktiviert den Light Mode und merkt sich die Auswahl im Browser
 - Einheitliche, weiche Karten für Übersicht und Formular; keine übergroßen Überschriften oder dekorativen Infoboxen
 
 ## Fachliche Regeln
