@@ -83,7 +83,11 @@ async function readPriceLimited(response: Response) {
       nextScan = total + scanIntervalBytes;
     }
   }
-  return extractProductPrice(content + decoder.decode());
+  const completeContent = content + decoder.decode();
+  if (/<title>\s*Client Challenge\s*<\/title>|\/_fs-ch-[^/]+\/script\.js/i.test(completeContent)) {
+    throw new PriceFetchError("Der Shop schützt die Produktseite vor automatischen Abrufen. Nutze dafür den Preishelfer im Browser.");
+  }
+  return extractProductPrice(completeContent);
 }
 
 function retryCookies(response: Response) {
