@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Bauprojekte Preishelfer",
+  "description": "Übernimmt den Preis der geöffneten Produktseite in dein Bauprojekte-Formular.",
+  "version": "1.0.0",
+  "permissions": ["activeTab", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Preis in Bauprojekte übernehmen"
+  }
+}
