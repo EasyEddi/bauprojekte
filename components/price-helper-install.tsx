@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useState } from "react";
+import { Check, Copy } from "lucide-react";
 
 function bookmarklet(origin: string) {
   const destination = JSON.stringify(`${origin}/preis-import`);
@@ -9,17 +10,43 @@ function bookmarklet(origin: string) {
 }
 
 export function PriceHelperInstall({ origin }: { origin: string }) {
-  const bookmark = useRef<HTMLAnchorElement>(null);
-  useEffect(() => {
-    bookmark.current?.setAttribute("href", bookmarklet(origin));
-  }, [origin]);
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const code = bookmarklet(origin);
+
+  async function copyCode() {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopyState("copied");
+    } catch {
+      const input = document.createElement("textarea");
+      input.value = code;
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.append(input);
+      input.select();
+      const copied = document.execCommand("copy");
+      input.remove();
+      setCopyState(copied ? "copied" : "error");
+    }
+    window.setTimeout(() => setCopyState("idle"), 3000);
+  }
+
   return (
     <div className="price-helper-install">
-      <p>Ziehe diesen Knopf einmal in deine Lesezeichenleiste:</p>
-      <a ref={bookmark} className="primary-button price-helper-bookmark" href="#">Preis übernehmen</a>
+      <p><strong>Einmal in Opera GX einrichten</strong></p>
+      <button className="primary-button price-helper-copy" type="button" onClick={() => void copyCode()}>
+        {copyState === "copied" ? <Check size={17} aria-hidden="true" /> : <Copy size={17} aria-hidden="true" />}
+        {copyState === "copied" ? "Preishelfer kopiert" : copyState === "error" ? "Kopieren fehlgeschlagen – erneut versuchen" : "Preishelfer-Code kopieren"}
+      </button>
+      <ol>
+        <li>Oben rechts in Opera GX auf „Einfache Einrichtung“ klicken und „Lesezeichenleiste anzeigen“ einschalten.</li>
+        <li>Diese Seite mit dem Herz rechts in der Adressleiste als Lesezeichen speichern.</li>
+        <li>Das neue Lesezeichen rechtsklicken, „Bearbeiten“ wählen und seine Adresse durch den kopierten Code ersetzen. Als Namen „Preis übernehmen“ eintragen.</li>
+      </ol>
+      <p><strong>Danach bei jedem Produkt</strong></p>
       <ol>
         <li>Im Projektformular auf „Produkt öffnen“ klicken.</li>
-        <li>Auf der Produktseite das Lesezeichen „Preis übernehmen“ anklicken.</li>
+        <li>Auf der Produktseite in der Lesezeichenleiste „Preis übernehmen“ anklicken.</li>
         <li>Der Preis erscheint automatisch im noch geöffneten Projektformular.</li>
       </ol>
       <small>Der Helfer liest nur die geöffnete Produktseite. Er überträgt keine Anmeldung und führt keine Shop-Automation aus.</small>
