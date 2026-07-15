@@ -6,4 +6,4 @@
 4. `Entpackte Erweiterung laden` wählen und diesen Ordner auswählen.
 5. Den Preishelfer über das Erweiterungsmenü an die Symbolleiste heften.
 
-Die Erweiterung hat nur die Berechtigungen `activeTab` und `scripting`. Sie kann eine Produktseite ausschließlich nach einem bewussten Klick auf ihr Symbol lesen. Bei einem gefundenen Preis öffnet sie `https://bauprojekte.vercel.app/preis-import` im aktuellen Produkttab.
+Die Erweiterung hat nur die Berechtigungen `activeTab` und `scripting`. Sie kann eine Produktseite ausschließlich nach einem bewussten Klick auf ihr Symbol lesen. Bei einem gefundenen Preis öffnet sie `https://bauprojekte.vercel.app/preis-import` im aktuellen Produkttab und übergibt Produktname, Link und Preis an den Projekteditor.

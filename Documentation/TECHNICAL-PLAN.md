@@ -51,7 +51,7 @@ Produktseiten unterscheiden sich stark. Manche Shops liefern strukturierte Daten
 6. Bekannte Shop-Konfigurationen über kleine, getrennte Adapter berücksichtigen; aktuell wird die im Stofferia-Link gespeicherte Stofflänge auf den Meterpreis angewendet.
 7. Den ermittelten Cent-Wert mit dem Preisstatus im Material speichern.
 8. Falls kein Preis gefunden wird, direkt im Formular einen manuellen Ersatzpreis anbieten.
-9. Bei Shop-Schutzseiten kann der Admin optional die lokale Opera-GX-Erweiterung „Bauprojekte Preishelfer“ installieren. Sie hat nur `activeTab` und `scripting`, liest eine Produktseite erst nach einem bewussten Klick und übergibt nur den Cent-Wert an das offene Formular. Dadurch bleibt sie auch bei Seiten nutzbar, deren Content Security Policy Lesezeichen-Skripte blockiert.
+9. Bei Shop-Schutzseiten kann der Admin optional die lokale Opera-GX-Erweiterung „Bauprojekte Preishelfer“ installieren. Sie hat nur `activeTab` und `scripting`, liest eine Produktseite erst nach einem bewussten Klick und übergibt Produktname, Link und Cent-Wert an den Projekteditor. Der Import funktioniert sowohl direkt von einer Produktseite als auch mit einem bereits geöffneten Material im Formular. Dadurch bleibt er auch bei Seiten nutzbar, deren Content Security Policy Lesezeichen-Skripte blockiert.
 10. Später für weitere häufig genutzte Shops gezielte Adapter ergänzen.
 
 ### Aktualisierungsrhythmus

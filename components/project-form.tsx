@@ -34,6 +34,12 @@ const completedImportKey = "bauprojekte-price-import-completed";
 
 type CompletedPriceImport = { materialId: number; priceMinor: number };
 
+export type InitialPriceImport = {
+  priceMinor: number;
+  productName: string;
+  productUrl: string;
+};
+
 function euroInputToMinor(value: string) {
   const parsed = Number.parseFloat(value.replace(",", "."));
   return Number.isFinite(parsed) ? Math.max(0, Math.round(parsed * 100)) : 0;
@@ -52,9 +58,15 @@ async function requestPrice(url: string) {
   return result.priceMinor;
 }
 
-export function ProjectForm() {
+export function ProjectForm({ initialImport }: { initialImport?: InitialPriceImport }) {
   const router = useRouter();
-  const [materials, setMaterials] = useState<DraftMaterial[]>([emptyMaterial(1)]);
+  const [materials, setMaterials] = useState<DraftMaterial[]>(initialImport ? [{
+    ...emptyMaterial(1),
+    name: initialImport.productName,
+    url: initialImport.productUrl,
+    priceMinor: initialImport.priceMinor,
+    priceState: "current",
+  }] : [emptyMaterial(1)]);
   const [imageName, setImageName] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
