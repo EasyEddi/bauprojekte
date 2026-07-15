@@ -89,6 +89,14 @@ Das ist „nahezu aktuell“, ohne Shops bei jedem Besuch unnötig anzufragen od
 5. Noch nicht abgerufene Preise werden vor dem Speichern geprüft.
 6. Der Server berechnet beziehungsweise liefert die neue Summe.
 
+### Projekt bearbeiten oder löschen
+
+1. Ein eigenes Kontextmenü auf der Projektkachel führt zur Bearbeitungsseite oder öffnet die Löschbestätigung.
+2. Ohne bestätigte Admin-Sitzung zeigt die Bearbeitungsseite zuerst die Anmeldung; öffentliche Schreibzugriffe bleiben gesperrt.
+3. Änderungen werden serverseitig erneut vollständig validiert und ersetzen die bestehende Projektdatei unter demselben Slug.
+4. Beim Bildaustausch oder Löschen werden nicht mehr benötigte Bilddateien aus Vercel Blob entfernt.
+5. Das Löschen entfernt Projektdatei und optionales Vorschaubild erst nach einer eigenen Bestätigung.
+
 ## Beobachtbarkeit und Fehlerbehandlung
 
 - Nutzerfreundliche Statusangaben: aktuell, manuell, veraltet oder Prüfung fehlgeschlagen

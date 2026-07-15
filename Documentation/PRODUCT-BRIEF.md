@@ -38,6 +38,7 @@
 - Detailseite pro Projekt
 - Sichere Anmeldung für genau einen Verwalter
 - Projekt erstellen, bearbeiten, veröffentlichen und löschen
+- Eigenes Rechtsklickmenü auf Projektkacheln mit Bearbeiten und Löschen
 - Bild optional hochladen
 - Materialien hinzufügen, ändern und entfernen
 - Menge und Einzelpreis je Material
@@ -72,6 +73,7 @@
 - Ruhige Farbflächen in Hellgrün und Creme, dunkles Grün für Aktionen und ein sparsamer Terrakotta-Akzent
 - Dark Mode ist der Standard; ein Umschalter links oben aktiviert den Light Mode und merkt sich die Auswahl im Browser
 - Einheitliche, weiche Karten für Übersicht und Formular; keine übergroßen Überschriften oder dekorativen Infoboxen
+- Die Projektdetailseite verwendet denselben schlichten Kartenstil wie Übersicht und Formular
 
 ## Fachliche Regeln
 

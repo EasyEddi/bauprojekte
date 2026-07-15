@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ExternalLink, ImagePlus, Link2, LoaderCircle, Plus, RefreshCw, Trash2 } from "lucide-react";
-import { formatPrice } from "@/lib/projects";
+import { formatPrice, type Project } from "@/lib/projects";
 
 type PriceState = "idle" | "loading" | "current" | "manual" | "error";
 
 type DraftMaterial = {
   id: number;
+  storedId?: string;
   name: string;
   url: string;
   quantity: number;
@@ -40,6 +41,27 @@ export type InitialPriceImport = {
   productUrl: string;
 };
 
+type ProjectFormProps = {
+  initialImport?: InitialPriceImport;
+  initialProject?: Project;
+};
+
+function projectDraftMaterials(project: Project): DraftMaterial[] {
+  return project.materials.map((material, index) => ({
+    id: index + 1,
+    storedId: material.id,
+    name: material.name,
+    url: material.productUrl,
+    quantity: material.quantity,
+    priceMinor: material.unitPriceMinor,
+    priceState: material.priceStatus === "manual" ? "manual" : "current",
+    manualPriceEuro: material.priceStatus === "manual"
+      ? (material.unitPriceMinor / 100).toFixed(2).replace(".", ",")
+      : "",
+    priceError: "",
+  }));
+}
+
 function euroInputToMinor(value: string) {
   const parsed = Number.parseFloat(value.replace(",", "."));
   return Number.isFinite(parsed) ? Math.max(0, Math.round(parsed * 100)) : 0;
@@ -58,15 +80,17 @@ async function requestPrice(url: string) {
   return result.priceMinor;
 }
 
-export function ProjectForm({ initialImport }: { initialImport?: InitialPriceImport }) {
+export function ProjectForm({ initialImport, initialProject }: ProjectFormProps) {
   const router = useRouter();
-  const [materials, setMaterials] = useState<DraftMaterial[]>(initialImport ? [{
-    ...emptyMaterial(1),
-    name: initialImport.productName,
-    url: initialImport.productUrl,
-    priceMinor: initialImport.priceMinor,
-    priceState: "current",
-  }] : [emptyMaterial(1)]);
+  const [materials, setMaterials] = useState<DraftMaterial[]>(initialProject
+    ? projectDraftMaterials(initialProject)
+    : initialImport ? [{
+      ...emptyMaterial(1),
+      name: initialImport.productName,
+      url: initialImport.productUrl,
+      priceMinor: initialImport.priceMinor,
+      priceState: "current",
+    }] : [emptyMaterial(1)]);
   const [imageName, setImageName] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -187,6 +211,7 @@ export function ProjectForm({ initialImport }: { initialImport?: InitialPriceImp
       }));
 
       form.set("materials", JSON.stringify(resolvedMaterials.map((material) => ({
+        id: material.storedId,
         name: material.name,
         productUrl: material.url,
         quantity: material.quantity,
@@ -194,14 +219,17 @@ export function ProjectForm({ initialImport }: { initialImport?: InitialPriceImp
         priceStatus: material.priceState === "manual" ? "manual" : "current",
       }))));
 
-      const response = await fetch("/api/projects", { method: "POST", body: form });
+      const response = await fetch(initialProject ? `/api/projects/${initialProject.slug}` : "/api/projects", {
+        method: initialProject ? "PATCH" : "POST",
+        body: form,
+      });
       const result = await response.json().catch(() => ({})) as { error?: string; slug?: string };
       if (response.status === 401) {
         router.refresh();
         return;
       }
       if (!response.ok || !result.slug) {
-        setError(result.error ?? "Das Projekt konnte nicht gespeichert werden. Bitte versuche es erneut.");
+        setError(result.error ?? `Das Projekt konnte nicht ${initialProject ? "aktualisiert" : "gespeichert"} werden. Bitte versuche es erneut.`);
         return;
       }
       router.push(`/projekte/${result.slug}`);
@@ -220,17 +248,18 @@ export function ProjectForm({ initialImport }: { initialImport?: InitialPriceImp
         <div className="form-grid">
           <label className="field field-wide">
             <span>Projektname</span>
-            <input name="name" maxLength={120} placeholder="z. B. Eine eigene Gartenbank" onChange={() => setError("")} />
+            <input name="name" maxLength={120} defaultValue={initialProject?.name} placeholder="z. B. Eine eigene Gartenbank" onChange={() => setError("")} />
           </label>
           <label className="field field-wide">
             <span>Beschreibung <small>optional</small></span>
-            <textarea name="description" maxLength={5000} rows={5} placeholder="Was möchtest du bauen?" onChange={() => setError("")} />
+            <textarea name="description" maxLength={5000} rows={5} defaultValue={initialProject?.description} placeholder="Was möchtest du bauen?" onChange={() => setError("")} />
           </label>
           <label className="image-upload field-wide">
             <ImagePlus size={28} aria-hidden="true" />
-            <span><strong>{imageName || "Vorschaubild auswählen"}</strong>optional · JPG, PNG oder WebP · maximal 2 MB</span>
+            <span><strong>{imageName || (initialProject?.image ? "Neues Vorschaubild auswählen" : "Vorschaubild auswählen")}</strong>{initialProject?.image && !imageName ? "aktuelles Bild bleibt erhalten · " : ""}optional · JPG, PNG oder WebP · maximal 2 MB</span>
             <input name="image" type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => { setImageName(event.target.files?.[0]?.name ?? ""); setError(""); }} />
           </label>
+          {initialProject?.image && <label className="remove-image-control field-wide"><input name="removeImage" type="checkbox" /> Aktuelles Vorschaubild entfernen</label>}
         </div>
       </section>
 
@@ -247,7 +276,7 @@ export function ProjectForm({ initialImport }: { initialImport?: InitialPriceImp
               </div>
               <div className="material-form-grid">
                 <label className="field material-name"><span>Bezeichnung</span><input value={material.name} placeholder="Konstruktionsholz" onChange={(event) => updateMaterial(material.id, { name: event.target.value })} /></label>
-                <label className="field material-url"><span>Produktlink</span><div className="input-with-icon"><Link2 size={17} /><input type="url" value={material.url} placeholder="https://..." onBlur={() => void syncPrice(material.id)} onChange={(event) => updateMaterial(material.id, { url: event.target.value, priceMinor: null, priceState: "idle", manualPriceEuro: "", priceError: "" })} /></div></label>
+                <label className="field material-url"><span>Produktlink</span><div className="input-with-icon"><Link2 size={17} /><input type="url" value={material.url} aria-label={`Produktlink für Material ${index + 1}`} onBlur={() => void syncPrice(material.id)} onChange={(event) => updateMaterial(material.id, { url: event.target.value, priceMinor: null, priceState: "idle", manualPriceEuro: "", priceError: "" })} /></div></label>
                 <label className="field"><span>Menge</span><input type="number" min="0.1" step="0.1" value={material.quantity} onChange={(event) => updateMaterial(material.id, { quantity: Number(event.target.value) })} /></label>
                 <div className={`material-price-box is-${material.priceState}`} aria-live="polite">
                   {material.priceState === "loading" && <><LoaderCircle className="spin" size={18} /><span>Preis wird geladen …</span></>}
@@ -274,7 +303,7 @@ export function ProjectForm({ initialImport }: { initialImport?: InitialPriceImp
         {error && <p className="form-error" role="alert">{error}</p>}
         <div className="form-submit-bar">
           <div><span>Aktuelle Materialsumme</span><strong>{formatPrice(total)}</strong></div>
-          <button className="primary-button" type="submit" disabled={pending}>{pending ? "Speichert …" : "Projekt speichern"} <Check size={18} /></button>
+          <button className="primary-button" type="submit" disabled={pending}>{pending ? "Speichert …" : initialProject ? "Änderungen speichern" : "Projekt speichern"} <Check size={18} /></button>
         </div>
       </div>
     </form>

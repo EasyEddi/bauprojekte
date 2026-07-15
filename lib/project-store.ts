@@ -1,5 +1,7 @@
 import "server-only";
-import { list, put } from "@vercel/blob";
+
+import { del, list, put } from "@vercel/blob";
+import type { ProjectInput, ProjectMaterialInput } from "@/lib/project-input";
 import type { Material, Project } from "@/lib/projects";
 
 const projectPrefix = "projects/";
@@ -26,13 +28,6 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
   return projects.find((project) => project.slug === slug) ?? null;
 }
 
-type NewProject = {
-  name: string;
-  description: string;
-  image: File | null;
-  materials: Array<Pick<Material, "name" | "productUrl" | "quantity" | "unitPriceMinor" | "priceStatus">>;
-};
-
 function slugify(name: string) {
   const base = name
     .normalize("NFD")
@@ -44,18 +39,37 @@ function slugify(name: string) {
   return `${base}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
-export async function saveProject(input: NewProject): Promise<Project> {
-  const slug = slugify(input.name);
-  let imageUrl: string | null = null;
-  if (input.image) {
-    const extension = input.image.type === "image/png" ? "png" : input.image.type === "image/webp" ? "webp" : "jpg";
-    const imageBlob = await put(`images/${slug}.${extension}`, input.image, {
-      access: "public",
-      addRandomSuffix: false,
-    });
-    imageUrl = imageBlob.url;
-  }
+async function uploadImage(slug: string, image: File) {
+  const extension = image.type === "image/png" ? "png" : image.type === "image/webp" ? "webp" : "jpg";
+  const imageBlob = await put(`images/${slug}.${extension}`, image, {
+    access: "public",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+  });
+  return imageBlob.url;
+}
 
+function projectMaterials(input: ProjectMaterialInput[], now: Date, existing: Project | null): Material[] {
+  return input.map((material, index) => {
+    const previous = material.id ? existing?.materials.find((entry) => entry.id === material.id) : undefined;
+    return {
+      id: previous?.id ?? crypto.randomUUID(),
+      name: material.name,
+      productUrl: material.productUrl,
+      quantity: material.quantity,
+      unitLabel: previous?.unitLabel ?? "Stück",
+      unitPriceMinor: material.unitPriceMinor,
+      currency: "EUR",
+      priceStatus: material.priceStatus,
+      lastCheckedLabel: now.toLocaleDateString("de-DE"),
+      sortOrder: index + 1,
+    };
+  });
+}
+
+export async function saveProject(input: ProjectInput): Promise<Project> {
+  const slug = slugify(input.name);
+  const imageUrl = input.image ? await uploadImage(slug, input.image) : null;
   const now = new Date();
   const project: Project = {
     id: crypto.randomUUID(),
@@ -69,25 +83,57 @@ export async function saveProject(input: NewProject): Promise<Project> {
     status: "Geplant",
     difficulty: "Noch offen",
     duration: "Noch offen",
-    materials: input.materials.map((material, index) => ({
-      id: crypto.randomUUID(),
-      name: material.name,
-      productUrl: material.productUrl,
-      quantity: material.quantity,
-      unitLabel: "Stück",
-      unitPriceMinor: material.unitPriceMinor,
-      currency: "EUR",
-      priceStatus: material.priceStatus,
-      lastCheckedLabel: now.toLocaleDateString("de-DE"),
-      sortOrder: index + 1,
-    })),
+    materials: projectMaterials(input.materials, now, null),
   };
 
   await put(`${projectPrefix}${slug}.json`, JSON.stringify(project), {
     access: "public",
     addRandomSuffix: false,
+    allowOverwrite: true,
     contentType: "application/json; charset=utf-8",
   });
 
   return project;
+}
+
+export async function updateProject(slug: string, input: ProjectInput): Promise<Project | null> {
+  const existing = await getProjectBySlug(slug);
+  if (!existing) return null;
+
+  let imageUrl = existing.image;
+  if (input.image) {
+    const nextImageUrl = await uploadImage(slug, input.image);
+    if (existing.image && existing.image !== nextImageUrl) await del(existing.image);
+    imageUrl = nextImageUrl;
+  } else if (input.removeImage && existing.image) {
+    await del(existing.image);
+    imageUrl = null;
+  }
+
+  const now = new Date();
+  const project: Project = {
+    ...existing,
+    name: input.name,
+    summary: input.description.slice(0, 180),
+    description: input.description,
+    image: imageUrl,
+    imageAlt: input.name,
+    materials: projectMaterials(input.materials, now, existing),
+  };
+
+  await put(`${projectPrefix}${slug}.json`, JSON.stringify(project), {
+    access: "public",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: "application/json; charset=utf-8",
+  });
+
+  return project;
+}
+
+export async function deleteProject(slug: string): Promise<boolean> {
+  const existing = await getProjectBySlug(slug);
+  if (!existing) return false;
+  await del([`${projectPrefix}${slug}.json`, ...(existing.image ? [existing.image] : [])]);
+  return true;
 }
