@@ -45,10 +45,11 @@ Produktseiten unterscheiden sich stark. Manche Shops liefern strukturierte Daten
 2. Serverseitig abrufen; private Netzwerkadressen und Weiterleitungen dorthin blockieren.
 3. JSON-LD vom Typ `Product` und `Offer` auslesen.
 4. Als zweite Stufe standardisierte Meta-Tags prüfen.
-5. Bekannte Shop-Konfigurationen über kleine, getrennte Adapter berücksichtigen; aktuell wird die im Stofferia-Link gespeicherte Stofflänge auf den Meterpreis angewendet.
-6. Den ermittelten Cent-Wert mit dem Preisstatus im Material speichern.
-7. Falls kein Preis gefunden wird, direkt im Formular einen manuellen Ersatzpreis anbieten.
-8. Später für weitere häufig genutzte Shops gezielte Adapter ergänzen.
+5. Als allgemeine dritte Stufe semantische HTML-Preismarkierungen sammeln und bewerten; alte Preise, UVP und uneindeutige Kandidaten nicht automatisch übernehmen.
+6. Bekannte Shop-Konfigurationen über kleine, getrennte Adapter berücksichtigen; aktuell wird die im Stofferia-Link gespeicherte Stofflänge auf den Meterpreis angewendet.
+7. Den ermittelten Cent-Wert mit dem Preisstatus im Material speichern.
+8. Falls kein Preis gefunden wird, direkt im Formular einen manuellen Ersatzpreis anbieten.
+9. Später für weitere häufig genutzte Shops gezielte Adapter ergänzen.
 
 ### Aktualisierungsrhythmus
 

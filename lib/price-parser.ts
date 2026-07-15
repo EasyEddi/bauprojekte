@@ -1,7 +1,7 @@
 export type ParsedPrice = {
   priceMinor: number;
   currency: "EUR";
-  source: "json-ld" | "meta" | "adapter";
+  source: "json-ld" | "meta" | "html" | "adapter";
 };
 
 function parseAmount(value: unknown) {
@@ -79,6 +79,71 @@ function attributes(tag: string) {
   return result;
 }
 
+type PriceCandidate = { amount: number; score: number };
+
+function euroAmounts(value: string) {
+  const amounts: number[] = [];
+  const expressions = [
+    /(?:€|EUR)\s*(\d[\d\s.]*?(?:,\d{1,2}|\.\d{1,2})?)(?!\d)/gi,
+    /(\d[\d\s.]*?(?:,\d{1,2}|\.\d{1,2})?)\s*(?:€|EUR)(?![a-z])/gi,
+  ];
+  for (const expression of expressions) {
+    for (const match of value.matchAll(expression)) {
+      const amount = parseAmount(match[1]);
+      if (amount !== null) amounts.push(amount);
+    }
+  }
+  return [...new Set(amounts)];
+}
+
+function semanticScore(values: Record<string, string>) {
+  if (values.hidden !== undefined || values["aria-hidden"] === "true") return -1;
+  const itemprop = values.itemprop?.toLowerCase();
+  if (itemprop === "price") return 120;
+
+  const directPriceAttributes = ["data-price", "data-product-price", "data-current-price", "data-final-price", "data-price-amount"];
+  if (directPriceAttributes.some((name) => values[name] !== undefined)) return 115;
+
+  const semantic = Object.entries(values).map(([name, value]) => `${name} ${value}`).join(" ").toLowerCase();
+  if (/\b(?:old|original|list|strike|crossed|previous|was)[-_ ]?price\b|\buvp\b|\brrp\b/.test(semantic)) return -1;
+  if (/\b(?:product|current|final|sale|selling)[-_ ]?(?:price|preis)\b|\b(?:price|preis)[-_ ]?(?:current|final|sale)\b/.test(semantic)) return 100;
+  if (/\b(?:price|preis|amount)\b/.test(semantic)) return 80;
+  return -1;
+}
+
+function priceFromSemanticHtml(html: string): number | null {
+  const candidates: PriceCandidate[] = [];
+  const openingTags = html.matchAll(/<([a-z][a-z0-9:-]*)\b[^>]{0,1200}>/gi);
+  for (const match of openingTags) {
+    if (!/(?:price|preis|amount)/i.test(match[0])) continue;
+    const values = attributes(match[0]);
+    const score = semanticScore(values);
+    if (score < 0) continue;
+
+    const attributeAmounts: number[] = [];
+    for (const name of ["content", "value", "data-price", "data-product-price", "data-current-price", "data-final-price", "data-price-amount"]) {
+      if (values[name] === undefined) continue;
+      const amount = parseAmount(values[name]);
+      if (amount !== null) attributeAmounts.push(amount);
+    }
+    const uniqueAttributeAmounts = [...new Set(attributeAmounts)];
+    if (uniqueAttributeAmounts.length === 1) candidates.push({ amount: uniqueAttributeAmounts[0], score: score + 10 });
+
+    const start = (match.index ?? 0) + match[0].length;
+    const tail = html.slice(start, start + 700);
+    const closingIndex = tail.search(new RegExp(`</${match[1]}\\s*>`, "i"));
+    if (closingIndex < 0) continue;
+    const nearbyText = decodeEntities(tail.slice(0, closingIndex).replace(/<script\b[\s\S]*$/i, "").replace(/<[^>]+>/g, " "));
+    const visibleAmounts = euroAmounts(nearbyText);
+    if (visibleAmounts.length === 1) candidates.push({ amount: visibleAmounts[0], score });
+  }
+
+  if (candidates.length === 0) return null;
+  const bestScore = Math.max(...candidates.map((candidate) => candidate.score));
+  const bestAmounts = [...new Set(candidates.filter((candidate) => candidate.score === bestScore).map((candidate) => candidate.amount))];
+  return bestAmounts.length === 1 ? bestAmounts[0] : null;
+}
+
 export function extractProductPrice(html: string): ParsedPrice | null {
   const scripts = html.matchAll(/<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
   for (const script of scripts) {
@@ -107,5 +172,7 @@ export function extractProductPrice(html: string): ParsedPrice | null {
       if (amount !== null) return { priceMinor: Math.round(amount * 100), currency: "EUR", source: "meta" };
     }
   }
+  const semanticAmount = priceFromSemanticHtml(html);
+  if (semanticAmount !== null) return { priceMinor: Math.round(semanticAmount * 100), currency: "EUR", source: "html" };
   return null;
 }
