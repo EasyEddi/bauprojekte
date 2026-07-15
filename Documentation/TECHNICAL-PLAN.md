@@ -51,7 +51,8 @@ Produktseiten unterscheiden sich stark. Manche Shops liefern strukturierte Daten
 6. Bekannte Shop-Konfigurationen über kleine, getrennte Adapter berücksichtigen; aktuell wird die im Stofferia-Link gespeicherte Stofflänge auf den Meterpreis angewendet.
 7. Den ermittelten Cent-Wert mit dem Preisstatus im Material speichern.
 8. Falls kein Preis gefunden wird, direkt im Formular einen manuellen Ersatzpreis anbieten.
-9. Später für weitere häufig genutzte Shops gezielte Adapter ergänzen.
+9. Bei Shop-Schutzseiten kann der Admin optional einen Lesezeichen-Preishelfer nutzen. Er liest strukturierte Preisdaten in der bereits geöffneten Produktseite und übergibt nur den Cent-Wert an das offene Formular; er umgeht keine Shop-Anmeldung oder Zugriffssperre.
+10. Später für weitere häufig genutzte Shops gezielte Adapter ergänzen.
 
 ### Aktualisierungsrhythmus
 

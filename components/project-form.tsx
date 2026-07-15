@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ImagePlus, Link2, LoaderCircle, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Check, ExternalLink, ImagePlus, Link2, LoaderCircle, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { formatPrice } from "@/lib/projects";
 
 type PriceState = "idle" | "loading" | "current" | "manual" | "error";
@@ -28,6 +28,11 @@ const emptyMaterial = (id: number): DraftMaterial => ({
   manualPriceEuro: "",
   priceError: "",
 });
+
+const pendingImportKey = "bauprojekte-price-import-pending";
+const completedImportKey = "bauprojekte-price-import-completed";
+
+type CompletedPriceImport = { materialId: number; priceMinor: number };
 
 function euroInputToMinor(value: string) {
   const parsed = Number.parseFloat(value.replace(",", "."));
@@ -58,6 +63,24 @@ export function ProjectForm() {
     () => materials.reduce((sum, material) => sum + (material.priceMinor ?? 0) * Math.max(0, material.quantity), 0),
     [materials],
   );
+
+  useEffect(() => {
+    function receiveImport(event: StorageEvent) {
+      if (event.key !== completedImportKey || !event.newValue) return;
+      try {
+        const result = JSON.parse(event.newValue) as Partial<CompletedPriceImport>;
+        if (!Number.isInteger(result.materialId) || typeof result.priceMinor !== "number" || !Number.isInteger(result.priceMinor) || result.priceMinor < 0) return;
+        setMaterials((current) => current.map((material) => material.id === result.materialId
+          ? { ...material, priceMinor: result.priceMinor!, priceState: "current", manualPriceEuro: "", priceError: "" }
+          : material));
+        localStorage.removeItem(completedImportKey);
+      } catch {
+        // Ignore malformed browser-helper messages.
+      }
+    }
+    window.addEventListener("storage", receiveImport);
+    return () => window.removeEventListener("storage", receiveImport);
+  }, []);
 
   function updateMaterial(id: number, patch: Partial<DraftMaterial>) {
     setError("");
@@ -98,6 +121,12 @@ export function ProjectForm() {
       priceMinor: Number.isFinite(parsed) && parsed >= 0 ? euroInputToMinor(value) : null,
       priceState: Number.isFinite(parsed) && parsed >= 0 ? "manual" : "error",
     });
+  }
+
+  function openForBrowserImport(material: DraftMaterial) {
+    if (!material.url.trim()) return;
+    localStorage.setItem(pendingImportKey, JSON.stringify({ materialId: material.id, productUrl: material.url, createdAt: Date.now() }));
+    window.open(material.url, "_blank", "noopener");
   }
 
   function validate(form: FormData) {
@@ -214,6 +243,10 @@ export function ProjectForm() {
                   {material.priceState === "idle" && <><span>Preis wird aus dem Link geladen</span></>}
                   {(material.priceState === "error" || material.priceState === "manual") && <div className="price-fallback">
                     {material.priceState === "error" && <small>{material.priceError || "Preis nicht erkannt."}</small>}
+                    {material.priceState === "error" && <div className="price-helper-actions">
+                      <a href="/preishelfer" target="_blank" rel="noreferrer">Preishelfer einrichten</a>
+                      <button type="button" onClick={() => openForBrowserImport(material)}><ExternalLink size={14} /> Produkt öffnen</button>
+                    </div>}
                     <label className="field"><span>Ersatzpreis</span><div className="input-with-suffix"><input inputMode="decimal" value={material.manualPriceEuro} placeholder="0,00" onChange={(event) => setManualPrice(material.id, event.target.value)} /><span>€</span></div></label>
                     <button type="button" className="price-retry" onClick={() => void syncPrice(material.id)}><RefreshCw size={14} /> Erneut laden</button>
                   </div>}
