@@ -15,9 +15,9 @@ export function PriceHelperInstall() {
       </ol>
       <p><strong>Danach bei jedem Produkt</strong></p>
       <ol>
-        <li>Im Projektformular auf „Produkt öffnen“ klicken.</li>
+        <li>Die gewünschte Produktseite im Shop öffnen.</li>
         <li>Auf der Produktseite oben auf <Puzzle size={15} aria-label="Erweiterungen" /> und dann „Bauprojekte Preishelfer“ klicken.</li>
-        <li>Der Preis erscheint automatisch im noch geöffneten Projektformular.</li>
+        <li>Der Projekteditor öffnet sich mit Produktname, Link und erkanntem Preis.</li>
       </ol>
       <small>Die Erweiterung darf nur die gerade geöffnete Seite lesen und auch das erst, nachdem du ihr Symbol anklickst. Sie überträgt keine Shop-Anmeldung.</small>
     </div>

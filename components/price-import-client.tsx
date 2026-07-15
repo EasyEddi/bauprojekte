@@ -5,7 +5,13 @@ import { useEffect, useRef } from "react";
 const pendingImportKey = "bauprojekte-price-import-pending";
 const completedImportKey = "bauprojekte-price-import-completed";
 
-export function PriceImportClient({ priceMinor }: { priceMinor: number }) {
+type PriceImportClientProps = {
+  priceMinor: number;
+  productName: string;
+  productUrl: string;
+};
+
+export function PriceImportClient({ priceMinor, productName, productUrl }: PriceImportClientProps) {
   const message = useRef<HTMLParagraphElement>(null);
 
   function show(value: string) {
@@ -16,7 +22,17 @@ export function PriceImportClient({ priceMinor }: { priceMinor: number }) {
     try {
       const rawPending = localStorage.getItem(pendingImportKey);
       if (!rawPending) {
-        show("Kein offenes Material gefunden. Öffne das Produkt zuerst aus dem Projektformular.");
+        if (!productUrl) {
+          show("Der Produktlink fehlt. Öffne den Preishelfer bitte erneut auf der Produktseite.");
+          return;
+        }
+        const parameters = new URLSearchParams({
+          priceMinor: String(priceMinor),
+          productName,
+          productUrl,
+        });
+        show("Produkt erkannt. Der Projekteditor wird geöffnet …");
+        window.location.replace(`/neu?${parameters}`);
         return;
       }
       const pending = JSON.parse(rawPending) as { materialId?: unknown; createdAt?: unknown };
@@ -32,7 +48,7 @@ export function PriceImportClient({ priceMinor }: { priceMinor: number }) {
     } catch {
       show("Der Preis konnte nicht an das Projektformular übergeben werden.");
     }
-  }, [priceMinor]);
+  }, [priceMinor, productName, productUrl]);
 
   return <p ref={message} className="price-import-message" role="status">Preis wird übernommen …</p>;
 }

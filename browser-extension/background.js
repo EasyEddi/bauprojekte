@@ -91,7 +91,14 @@ chrome.action.onClicked.addListener(async (tab) => {
       await showPageMessage(tab.id, "Auf dieser Produktseite wurde kein eindeutiger Euro-Preis gefunden.");
       return;
     }
-    await chrome.tabs.update(tab.id, { url: `${importUrl}?priceMinor=${priceMinor}` });
+    const productUrl = typeof tab.url === "string" ? tab.url : "";
+    const productName = typeof tab.title === "string" ? tab.title : "";
+    const parameters = new URLSearchParams({
+      priceMinor: String(priceMinor),
+      productUrl,
+      productName,
+    });
+    await chrome.tabs.update(tab.id, { url: `${importUrl}?${parameters}` });
   } catch {
     await chrome.action.setBadgeBackgroundColor({ tabId: tab.id, color: "#a23b2a" });
     await chrome.action.setBadgeText({ tabId: tab.id, text: "!" });
