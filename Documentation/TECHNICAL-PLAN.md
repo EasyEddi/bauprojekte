@@ -20,6 +20,7 @@ Die Website wird als Next.js-Anwendung mit TypeScript umgesetzt und auf Vercel b
 - Serverseitige Prüfung jeder Verwalter-Sitzung
 - Vercel Blob als dauerhafte Datenquelle für Projekt-JSON und Bilder
 - Serverseitige Eingabeprüfung vor jedem Schreibzugriff
+- Preisabrufe bevorzugt aus der Vercel-Region Frankfurt, damit deutsche Shops ihre regionalen Produktpreise liefern
 
 ### Veröffentlichung
 
