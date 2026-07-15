@@ -571,7 +571,9 @@ body {
 .price-helper-install p { margin: 0 0 14px; }
 .price-helper-install ol { margin: 14px 0 24px; padding-left: 22px; line-height: 1.65; }
 .price-helper-install small { color: #617568; line-height: 1.5; }
-.price-helper-copy { width: max-content; }
+.price-helper-install code { padding: 2px 5px; background: #e2e9df; border-radius: 4px; font-size: .9em; }
+.price-helper-install li svg { vertical-align: -2px; }
+.price-helper-download { width: max-content; text-decoration: none; }
 .price-import-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #eef4ed; }
 .price-import-message { max-width: 520px; margin: 0; padding: 24px; background: #fff; border: 1px solid #d8e1d8; border-radius: 12px; text-align: center; }
 
