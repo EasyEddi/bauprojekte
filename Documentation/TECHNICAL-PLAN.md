@@ -44,6 +44,7 @@ Produktseiten unterscheiden sich stark. Manche Shops liefern strukturierte Daten
 
 1. URL normalisieren und nur `http` beziehungsweise `https` erlauben.
 2. Serverseitig abrufen; private Netzwerkadressen und Weiterleitungen dorthin blockieren.
+   Falls derselbe Shop bei der ersten Antwort eine öffentliche Markt- oder Sitzungsauswahl setzt, wird die Produktseite einmal mit genau diesen kurzlebigen Cookies erneut geladen.
 3. JSON-LD vom Typ `Product` und `Offer` auslesen.
 4. Als zweite Stufe standardisierte Meta-Tags prüfen.
 5. Als allgemeine dritte Stufe semantische HTML-Preismarkierungen sammeln und bewerten; alte Preise, UVP und uneindeutige Kandidaten nicht automatisch übernehmen.
