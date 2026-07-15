@@ -86,6 +86,34 @@ async function readPriceLimited(response: Response) {
   return extractProductPrice(content + decoder.decode());
 }
 
+function retryCookies(response: Response) {
+  const header = response.headers.get("set-cookie");
+  if (!header) return null;
+  const cookies = header
+    .split(/,(?=\s*[^;,=\s]+=[^;,]*)/)
+    .slice(0, 20)
+    .map((value) => value.split(";", 1)[0].trim())
+    .filter((value) => /^[^=\s]{1,100}=.{0,500}$/.test(value));
+  const result = cookies.join("; ");
+  return result.length > 0 && result.length <= 4_096 ? result : null;
+}
+
+function requestHeaders(cookie?: string) {
+  return {
+    accept: "text/html,application/xhtml+xml,application/json;q=0.8",
+    "accept-language": "de-DE,de;q=0.9",
+    "user-agent": "Bauprojekte-Preispruefung/1.0 (+https://bauprojekte.vercel.app)",
+    ...(cookie ? { cookie } : {}),
+  };
+}
+
+async function parseResponse(response: Response) {
+  if (!response.ok) throw new PriceFetchError(`Der Shop antwortet mit Status ${response.status}.`);
+  const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
+  if (!contentType.includes("html") && !contentType.includes("json")) throw new PriceFetchError("Der Link führt nicht zu einer lesbaren Produktseite.");
+  return readPriceLimited(response);
+}
+
 export async function fetchProductPrice(value: string): Promise<ParsedPrice> {
   let url = await validateTarget(value);
   const controller = new AbortController();
@@ -96,10 +124,7 @@ export async function fetchProductPrice(value: string): Promise<ParsedPrice> {
         cache: "no-store",
         redirect: "manual",
         signal: controller.signal,
-        headers: {
-          accept: "text/html,application/xhtml+xml,application/json;q=0.8",
-          "user-agent": "Bauprojekte-Preispruefung/1.0 (+https://bauprojekte.vercel.app)",
-        },
+        headers: requestHeaders(),
       });
       if ([301, 302, 303, 307, 308].includes(response.status)) {
         const location = response.headers.get("location");
@@ -107,10 +132,17 @@ export async function fetchProductPrice(value: string): Promise<ParsedPrice> {
         url = await validateTarget(new URL(location, url).toString());
         continue;
       }
-      if (!response.ok) throw new PriceFetchError(`Der Shop antwortet mit Status ${response.status}.`);
-      const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
-      if (!contentType.includes("html") && !contentType.includes("json")) throw new PriceFetchError("Der Link führt nicht zu einer lesbaren Produktseite.");
-      const result = await readPriceLimited(response);
+      let result = await parseResponse(response);
+      const cookies = result ? null : retryCookies(response);
+      if (!result && cookies) {
+        const retryResponse = await fetch(url, {
+          cache: "no-store",
+          redirect: "error",
+          signal: controller.signal,
+          headers: requestHeaders(cookies),
+        });
+        result = await parseResponse(retryResponse);
+      }
       if (!result) throw new PriceFetchError("Auf der Produktseite wurde kein maschinenlesbarer Euro-Preis gefunden.");
       return applyPriceAdapter(result, url);
     }
