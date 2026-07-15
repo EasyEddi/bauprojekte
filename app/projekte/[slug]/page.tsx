@@ -4,8 +4,8 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, CircleCheck, CircleDashed } from "lucide-react";
 import { notFound } from "next/navigation";
 import { FloatingAddButton } from "@/components/floating-add-button";
-import { getProjectBySlug } from "@/lib/project-store";
-import { formatPrice, getProjectTotal } from "@/lib/projects";
+import { getProjectBySlug, refreshProjectPrices } from "@/lib/project-store";
+import { formatPrice, getProjectTotal, materialSyncLabel } from "@/lib/projects";
 
 type ProjectPageProps = { params: Promise<{ slug: string }> };
 
@@ -19,8 +19,9 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = await getProjectBySlug(slug);
-  if (!project) notFound();
+  const storedProject = await getProjectBySlug(slug);
+  if (!storedProject) notFound();
+  const project = await refreshProjectPrices(storedProject);
   const total = getProjectTotal(project);
 
   return (
@@ -48,14 +49,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <div className="detail-material-list">
             {project.materials.map((material) => {
               const lineTotal = material.quantity * material.unitPriceMinor;
-              const isCurrent = material.priceStatus === "current";
+              const syncStatus = materialSyncLabel(material);
               return (
                 <div className="detail-material-row" key={material.id}>
                   <div className="detail-material-name">
                     <h3>{material.name}</h3>
-                    <span className={`price-status ${isCurrent ? "is-current" : "is-manual"}`}>
-                      {isCurrent ? <CircleCheck size={14} /> : <CircleDashed size={14} />}
-                      {isCurrent ? "Automatisch geprüft" : "Manueller Preis"} · Stand {material.lastCheckedLabel}
+                    <span className={`price-status ${syncStatus.isSynced ? "is-current" : "is-manual"}`}>
+                      {syncStatus.isSynced ? <CircleCheck size={14} /> : <CircleDashed size={14} />}
+                      {syncStatus.text}
                     </span>
                   </div>
                   <div className="detail-material-calculation"><span>{material.quantity} {material.unitLabel} × {formatPrice(material.unitPriceMinor)}</span><strong>{formatPrice(lineTotal)}</strong></div>

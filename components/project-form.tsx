@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ExternalLink, ImagePlus, Link2, LoaderCircle, Plus, RefreshCw, Trash2 } from "lucide-react";
-import { formatPrice, type Project } from "@/lib/projects";
+import { formatPrice, type PriceSource, type Project } from "@/lib/projects";
 
 type PriceState = "idle" | "loading" | "current" | "manual" | "error";
 
@@ -15,6 +15,8 @@ type DraftMaterial = {
   quantity: number;
   priceMinor: number | null;
   priceState: PriceState;
+  priceSource?: PriceSource;
+  lastCheckedAt?: string;
   manualPriceEuro: string;
   priceError: string;
 };
@@ -55,6 +57,8 @@ function projectDraftMaterials(project: Project): DraftMaterial[] {
     quantity: material.quantity,
     priceMinor: material.unitPriceMinor,
     priceState: material.priceStatus === "manual" ? "manual" : "current",
+    priceSource: material.priceSource,
+    lastCheckedAt: material.lastCheckedAt,
     manualPriceEuro: material.priceStatus === "manual"
       ? (material.unitPriceMinor / 100).toFixed(2).replace(".", ",")
       : "",
@@ -90,6 +94,8 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
       url: initialImport.productUrl,
       priceMinor: initialImport.priceMinor,
       priceState: "current",
+      priceSource: "browser",
+      lastCheckedAt: new Date().toISOString(),
     }] : [emptyMaterial(1)]);
   const [imageName, setImageName] = useState("");
   const [error, setError] = useState("");
@@ -107,7 +113,7 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
         const result = JSON.parse(event.newValue) as Partial<CompletedPriceImport>;
         if (!Number.isInteger(result.materialId) || typeof result.priceMinor !== "number" || !Number.isInteger(result.priceMinor) || result.priceMinor < 0) return;
         setMaterials((current) => current.map((material) => material.id === result.materialId
-          ? { ...material, priceMinor: result.priceMinor!, priceState: "current", manualPriceEuro: "", priceError: "" }
+          ? { ...material, priceMinor: result.priceMinor!, priceState: "current", priceSource: "browser", lastCheckedAt: new Date().toISOString(), manualPriceEuro: "", priceError: "" }
           : material));
         localStorage.removeItem(completedImportKey);
       } catch {
@@ -140,7 +146,7 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
     try {
       const priceMinor = await requestPrice(requestedUrl);
       setMaterials((current) => current.map((entry) => entry.id === id && entry.url === requestedUrl
-        ? { ...entry, priceMinor, priceState: "current", manualPriceEuro: "", priceError: "" }
+        ? { ...entry, priceMinor, priceState: "current", priceSource: "server", lastCheckedAt: new Date().toISOString(), manualPriceEuro: "", priceError: "" }
         : entry));
     } catch (priceError) {
       const message = priceError instanceof Error ? priceError.message : "Der Preis konnte nicht geladen werden.";
@@ -156,6 +162,8 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
       manualPriceEuro: value,
       priceMinor: Number.isFinite(parsed) && parsed >= 0 ? euroInputToMinor(value) : null,
       priceState: Number.isFinite(parsed) && parsed >= 0 ? "manual" : "error",
+      priceSource: Number.isFinite(parsed) && parsed >= 0 ? "manual" : undefined,
+      lastCheckedAt: Number.isFinite(parsed) && parsed >= 0 ? new Date().toISOString() : undefined,
     });
   }
 
@@ -201,8 +209,9 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
         updateMaterial(material.id, { priceState: "loading", priceError: "" });
         try {
           const priceMinor = await requestPrice(material.url);
-          updateMaterial(material.id, { priceMinor, priceState: "current", priceError: "" });
-          return { ...material, priceMinor, priceState: "current" as const };
+          const lastCheckedAt = new Date().toISOString();
+          updateMaterial(material.id, { priceMinor, priceState: "current", priceSource: "server", lastCheckedAt, priceError: "" });
+          return { ...material, priceMinor, priceState: "current" as const, priceSource: "server" as const, lastCheckedAt };
         } catch (priceError) {
           const message = priceError instanceof Error ? priceError.message : "Der Preis konnte nicht geladen werden.";
           updateMaterial(material.id, { priceState: "error", priceError: message });
@@ -217,6 +226,8 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
         quantity: material.quantity,
         unitPriceMinor: material.priceMinor,
         priceStatus: material.priceState === "manual" ? "manual" : "current",
+        priceSource: material.priceSource,
+        lastCheckedAt: material.lastCheckedAt,
       }))));
 
       const response = await fetch(initialProject ? `/api/projects/${initialProject.slug}` : "/api/projects", {
@@ -276,7 +287,7 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
               </div>
               <div className="material-form-grid">
                 <label className="field material-name"><span>Bezeichnung</span><input value={material.name} placeholder="Konstruktionsholz" onChange={(event) => updateMaterial(material.id, { name: event.target.value })} /></label>
-                <label className="field material-url"><span>Produktlink</span><div className="input-with-icon"><Link2 size={17} /><input type="url" value={material.url} aria-label={`Produktlink für Material ${index + 1}`} onBlur={() => void syncPrice(material.id)} onChange={(event) => updateMaterial(material.id, { url: event.target.value, priceMinor: null, priceState: "idle", manualPriceEuro: "", priceError: "" })} /></div></label>
+                <label className="field material-url"><span>Produktlink</span><div className="input-with-icon"><Link2 size={17} /><input type="url" value={material.url} aria-label={`Produktlink für Material ${index + 1}`} onBlur={() => void syncPrice(material.id)} onChange={(event) => updateMaterial(material.id, { url: event.target.value, priceMinor: null, priceState: "idle", priceSource: undefined, lastCheckedAt: undefined, manualPriceEuro: "", priceError: "" })} /></div></label>
                 <label className="field"><span>Menge</span><input type="number" min="0.1" step="0.1" value={material.quantity} onChange={(event) => updateMaterial(material.id, { quantity: Number(event.target.value) })} /></label>
                 <div className={`material-price-box is-${material.priceState}`} aria-live="polite">
                   {material.priceState === "loading" && <><LoaderCircle className="spin" size={18} /><span>Preis wird geladen …</span></>}

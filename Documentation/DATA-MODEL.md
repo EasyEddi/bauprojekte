@@ -31,8 +31,10 @@ Die Gesamtsumme wird bevorzugt aus den Materialdaten berechnet. Falls sie späte
 | `unitLabel` | Text, optional | Stück, Meter, Packung usw. |
 | `unitPriceMinor` | Integer | Aktueller Einzelpreis in Cent |
 | `currency` | Text | ISO-Währung, zunächst `EUR` |
-| `priceStatus` | Enum | `current` nach automatischer Prüfung oder `manual` als Ersatzpreis; später zusätzlich `stale` |
-| `lastCheckedLabel` | Text | Datum der letzten Preisangabe |
+| `priceStatus` | Enum | `current` nach erfolgreicher Prüfung, `manual` als Ersatzpreis oder `stale` nach einer fehlgeschlagenen erneuten Serverprüfung |
+| `priceSource` | Enum | `server`, wenn die Website den Link selbst prüfen kann; `browser` bei Übernahme durch die Erweiterung; `manual` beim Ersatzpreis |
+| `lastCheckedAt` | ISO-Zeitstempel, optional | Exakter Zeitpunkt der letzten erfolgreichen Preisermittlung |
+| `lastCheckedLabel` | Text | Abwärtskompatibles deutsches Datum der letzten Preisangabe |
 | `sortOrder` | Integer | Reihenfolge innerhalb der Projektdatei |
 
 ## Später: Preisverlauf
@@ -64,3 +66,5 @@ Die Oberfläche formatiert Cent-Werte erst bei der Anzeige. Bei Dezimalmengen mu
 - Nur der Admin darf Projekte, Materialien und Bilder ändern.
 - Preisprüfungen schreiben ausschließlich über vertrauenswürdigen Servercode.
 - Preisfehler enthalten keine vollständigen fremden HTML-Antworten oder Geheimnisse.
+
+Beim Öffnen einer Projektseite werden ausschließlich Materialien mit `priceSource: server` erneut geprüft. Browser- und manuelle Preise bleiben unverändert. Alte Datensätze ohne `priceSource` werden einmal geprüft und anschließend entsprechend als `server`, `browser` oder `manual` eingeordnet.
