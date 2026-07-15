@@ -4,6 +4,7 @@ import { fetchProductPrice, PriceFetchError } from "@/lib/price-fetcher";
 import { hasValidRequestOrigin } from "@/lib/request-origin";
 
 export const runtime = "nodejs";
+export const preferredRegion = "fra1";
 
 export async function POST(request: Request) {
   if (!await isAdmin()) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
