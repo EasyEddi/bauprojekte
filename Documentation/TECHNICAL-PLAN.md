@@ -51,7 +51,7 @@ Produktseiten unterscheiden sich stark. Manche Shops liefern strukturierte Daten
 6. Bekannte Shop-Konfigurationen über kleine, getrennte Adapter berücksichtigen; aktuell wird die im Stofferia-Link gespeicherte Stofflänge auf den Meterpreis angewendet.
 7. Den ermittelten Cent-Wert zusammen mit Preisquelle, Preisstatus und Prüfzeitpunkt im Material speichern.
 8. Falls kein Preis gefunden wird, direkt im Formular einen manuellen Ersatzpreis anbieten.
-9. Bei Shop-Schutzseiten kann der Admin optional die lokale Opera-GX-Erweiterung „Bauprojekte Preishelfer“ installieren. Sie hat nur `activeTab` und `scripting`, liest eine Produktseite erst nach einem bewussten Klick und übergibt Produktname, Link und Cent-Wert an den Projekteditor. Der Import funktioniert sowohl direkt von einer Produktseite als auch mit einem bereits geöffneten Material im Formular. Dadurch bleibt er auch bei Seiten nutzbar, deren Content Security Policy Lesezeichen-Skripte blockiert.
+9. Bei Shop-Schutzseiten kann der Admin optional die lokale Opera-GX-Erweiterung „Bauprojekte Preishelfer“ installieren. Sie hat nur `activeTab` und `scripting`, liest eine Produktseite erst nach einem bewussten Klick und übergibt Produktname, Link und Cent-Wert an den Projekteditor. Der Import funktioniert sowohl direkt von einer Produktseite als auch mit einem bereits geöffneten Material im Formular. Ist kein Hauptpreis automatisch eindeutig, kann der Admin ihn direkt auf der Produktseite anklicken. Dadurch bleibt der Preishelfer shopunabhängig und auch bei Seiten nutzbar, deren Content Security Policy Lesezeichen-Skripte blockiert.
 10. Später für weitere häufig genutzte Shops gezielte Adapter ergänzen.
 
 ### Aktualisierungsrhythmus
@@ -92,11 +92,12 @@ Das ist „nahezu aktuell“, ohne Shops bei jedem Besuch unnötig anzufragen od
 
 ### Projekt bearbeiten oder löschen
 
-1. Ein eigenes Kontextmenü auf der Projektkachel führt zur Bearbeitungsseite oder öffnet die Löschbestätigung.
+1. Ein eigenes Kontextmenü auf der Projektkachel führt zur Bearbeitungsseite oder öffnet die Löschbestätigung. Es öffnet sich per Rechtsklick, Tastatur-Kontexttaste oder Doppeltipp auf Touch-Geräten.
 2. Ohne bestätigte Admin-Sitzung zeigt die Bearbeitungsseite zuerst die Anmeldung; öffentliche Schreibzugriffe bleiben gesperrt.
 3. Änderungen werden serverseitig erneut vollständig validiert und ersetzen die bestehende Projektdatei unter demselben Slug.
 4. Beim Bildaustausch oder Löschen werden nicht mehr benötigte Bilddateien aus Vercel Blob entfernt.
 5. Das Löschen entfernt Projektdatei und optionales Vorschaubild erst nach einer eigenen Bestätigung.
+6. Projektdateien werden mit dem Blob-Zeitstempel als Cache-Version gelesen. Eine parallel laufende Preisprüfung übernimmt vor dem Schreiben erneut den neuesten Projektstand und führt ausschließlich unveränderte Preisfelder zusammen.
 
 ## Beobachtbarkeit und Fehlerbehandlung
 

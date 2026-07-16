@@ -291,7 +291,7 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
                 <label className="field"><span>Menge</span><input type="number" min="0.1" step="0.1" value={material.quantity} onChange={(event) => updateMaterial(material.id, { quantity: Number(event.target.value) })} /></label>
                 <div className={`material-price-box is-${material.priceState}`} aria-live="polite">
                   {material.priceState === "loading" && <><LoaderCircle className="spin" size={18} /><span>Preis wird geladen …</span></>}
-                  {material.priceState === "current" && <><Check size={18} /><span>Automatisch erkannt<strong>{formatPrice(material.priceMinor ?? 0)}</strong></span></>}
+                  {material.priceState === "current" && <><Check size={18} /><span>{material.priceSource === "browser" ? "Manuell synchronisiert" : "Automatisch erkannt"}<strong>{formatPrice(material.priceMinor ?? 0)}</strong></span></>}
                   {material.priceState === "idle" && <><span>Preis wird aus dem Link geladen</span></>}
                   {(material.priceState === "error" || material.priceState === "manual") && <div className="price-fallback">
                     {material.priceState === "error" && <small>{material.priceError || "Preis nicht erkannt."}</small>}

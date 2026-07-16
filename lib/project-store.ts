@@ -13,7 +13,9 @@ export async function getProjects(): Promise<Project[]> {
     blobs
       .filter((blob) => blob.pathname.endsWith(".json"))
       .map(async (blob) => {
-        const response = await fetch(blob.url, { cache: "no-store" });
+        const readUrl = new URL(blob.url);
+        readUrl.searchParams.set("version", new Date(blob.uploadedAt).toISOString());
+        const response = await fetch(readUrl, { cache: "no-store" });
         if (!response.ok) return null;
         return response.json() as Promise<Project>;
       }),
@@ -118,7 +120,39 @@ export async function refreshProjectPrices(project: Project): Promise<Project> {
   }));
 
   if (!changed) return project;
-  const updated = { ...project, materials };
+  const latest = await getProjectBySlug(project.slug);
+  if (!latest) return project;
+
+  const originalById = new Map(project.materials.map((material) => [material.id, material]));
+  const refreshedById = new Map(materials.map((material) => [material.id, material]));
+  let appliedRefresh = false;
+  const mergedMaterials = latest.materials.map((material) => {
+    const original = originalById.get(material.id);
+    const refreshed = refreshedById.get(material.id);
+    if (!original || !refreshed) return material;
+    const wasRefreshed = refreshed.unitPriceMinor !== original.unitPriceMinor
+      || refreshed.priceStatus !== original.priceStatus
+      || refreshed.priceSource !== original.priceSource
+      || refreshed.lastCheckedAt !== original.lastCheckedAt;
+    if (!wasRefreshed) return material;
+    const priceWasEdited = material.productUrl !== original.productUrl
+      || material.unitPriceMinor !== original.unitPriceMinor
+      || material.priceSource !== original.priceSource
+      || material.lastCheckedAt !== original.lastCheckedAt;
+    if (priceWasEdited) return material;
+    appliedRefresh = true;
+    return {
+      ...material,
+      unitPriceMinor: refreshed.unitPriceMinor,
+      currency: refreshed.currency,
+      priceStatus: refreshed.priceStatus,
+      priceSource: refreshed.priceSource,
+      lastCheckedAt: refreshed.lastCheckedAt,
+      lastCheckedLabel: refreshed.lastCheckedLabel,
+    };
+  });
+  if (!appliedRefresh) return latest;
+  const updated = { ...latest, materials: mergedMaterials };
   await writeProject(updated);
   return updated;
 }

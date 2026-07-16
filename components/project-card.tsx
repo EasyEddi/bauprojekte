@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeleteProjectDialog } from "@/components/delete-project-dialog";
 import { formatPrice, getProjectTotal, type Project } from "@/lib/projects";
@@ -10,8 +11,17 @@ import { formatPrice, getProjectTotal, type Project } from "@/lib/projects";
 type MenuPosition = { x: number; y: number };
 
 export function ProjectCard({ project, priority = false }: { project: Project; priority?: boolean }) {
+  const router = useRouter();
   const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const lastTap = useRef<{ time: number; x: number; y: number } | null>(null);
+  const navigationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ignoreTouchClick = useRef(false);
+
+  useEffect(() => () => {
+    if (navigationTimer.current) clearTimeout(navigationTimer.current);
+  }, []);
 
   useEffect(() => {
     if (!menuPosition) return;
@@ -36,12 +46,56 @@ export function ProjectCard({ project, priority = false }: { project: Project; p
     });
   }
 
+  function handleTouchEnd(event: React.TouchEvent<HTMLAnchorElement>) {
+    const start = touchStart.current;
+    const touch = event.changedTouches.item(0);
+    touchStart.current = null;
+    if (!start || !touch || Math.hypot(touch.clientX - start.x, touch.clientY - start.y) > 16) return;
+
+    event.preventDefault();
+    ignoreTouchClick.current = true;
+    const now = Date.now();
+    const previous = lastTap.current;
+    const isDoubleTap = previous
+      && now - previous.time <= 340
+      && Math.hypot(touch.clientX - previous.x, touch.clientY - previous.y) <= 32;
+
+    if (isDoubleTap) {
+      if (navigationTimer.current) clearTimeout(navigationTimer.current);
+      navigationTimer.current = null;
+      lastTap.current = null;
+      openMenu(touch.clientX, touch.clientY);
+      return;
+    }
+
+    lastTap.current = { time: now, x: touch.clientX, y: touch.clientY };
+    if (navigationTimer.current) clearTimeout(navigationTimer.current);
+    navigationTimer.current = setTimeout(() => {
+      navigationTimer.current = null;
+      lastTap.current = null;
+      ignoreTouchClick.current = false;
+      router.push(`/projekte/${project.slug}`);
+    }, 360);
+  }
+
   return (
     <div className="project-card-shell" onContextMenu={(event) => { event.preventDefault(); openMenu(event.clientX, event.clientY); }}>
       <Link
         className="project-card"
         href={`/projekte/${project.slug}`}
         aria-label={`${project.name} ansehen`}
+        onTouchStart={(event) => {
+          const touch = event.touches.item(0);
+          touchStart.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
+        }}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={() => { touchStart.current = null; }}
+        onClick={(event) => {
+          if (!ignoreTouchClick.current) return;
+          event.preventDefault();
+          event.stopPropagation();
+          ignoreTouchClick.current = false;
+        }}
         onKeyDown={(event) => {
           if (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")) {
             event.preventDefault();
