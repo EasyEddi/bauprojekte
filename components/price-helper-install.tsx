@@ -17,6 +17,7 @@ export function PriceHelperInstall() {
       <ol>
         <li>Die gewünschte Produktseite im Shop öffnen.</li>
         <li>Auf der Produktseite oben auf <Puzzle size={15} aria-label="Erweiterungen" /> und dann „Bauprojekte Preishelfer“ klicken.</li>
+        <li>Falls kein Preis eindeutig erkannt wird, direkt auf den sichtbaren Hauptpreis der Produktseite klicken.</li>
         <li>Der Projekteditor öffnet sich mit Produktname, Link und erkanntem Preis.</li>
       </ol>
       <small>Die Erweiterung darf nur die gerade geöffnete Seite lesen und auch das erst, nachdem du ihr Symbol anklickst. Sie überträgt keine Shop-Anmeldung.</small>
