@@ -97,7 +97,8 @@ Das ist „nahezu aktuell“, ohne Shops bei jedem Besuch unnötig anzufragen od
 3. Änderungen werden serverseitig erneut vollständig validiert und ersetzen die bestehende Projektdatei unter demselben Slug.
 4. Beim Bildaustausch oder Löschen werden nicht mehr benötigte Bilddateien aus Vercel Blob entfernt.
 5. Das Löschen entfernt Projektdatei und optionales Vorschaubild erst nach einer eigenen Bestätigung.
-6. Projektdateien werden mit dem Blob-Zeitstempel als Cache-Version gelesen. Eine parallel laufende Preisprüfung übernimmt vor dem Schreiben erneut den neuesten Projektstand und führt ausschließlich unveränderte Preisfelder zusammen.
+6. Projektdateien werden mit Blob-Zeitstempel und einer eindeutigen Abruf-ID cachefrei gelesen. Nach erfolgreichem Bearbeiten lädt der Browser die Projektseite vollständig neu.
+7. Eine beim Öffnen laufende Preisprüfung verändert nur die aktuelle Seitenansicht und schreibt niemals eine möglicherweise ältere Projektkopie zurück. Dauerhafte Projektdaten werden ausschließlich durch Erstellen oder Bearbeiten geändert.
 
 ## Beobachtbarkeit und Fehlerbehandlung
 

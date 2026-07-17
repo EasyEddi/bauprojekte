@@ -243,8 +243,7 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
         setError(result.error ?? `Das Projekt konnte nicht ${initialProject ? "aktualisiert" : "gespeichert"} werden. Bitte versuche es erneut.`);
         return;
       }
-      router.push(`/projekte/${result.slug}`);
-      router.refresh();
+      window.location.assign(`/projekte/${result.slug}?saved=${Date.now()}`);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Die Verbindung ist fehlgeschlagen. Bitte versuche es erneut.");
     } finally {
