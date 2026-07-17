@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowUpRight, CircleCheck, CircleDashed } from "lucide-react
 import { notFound } from "next/navigation";
 import { FloatingAddButton } from "@/components/floating-add-button";
 import { getProjectBySlug, refreshProjectPrices } from "@/lib/project-store";
-import { formatPrice, getProjectTotal, materialSyncLabel } from "@/lib/projects";
+import { formatPrice, getProjectTotal, materialSyncLabel, projectKindLabel } from "@/lib/projects";
 
 type ProjectPageProps = { params: Promise<{ slug: string }> };
 
@@ -34,7 +34,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <Image src={project.image} alt={project.imageAlt} fill priority sizes="(max-width: 960px) 100vw, 960px" />
           </div>}
           <div className="detail-overview-body">
-            <h1>{project.name}</h1>
+            <div className="detail-overview-title">
+              <small>{projectKindLabel(project.kind)}</small>
+              <h1>{project.name}</h1>
+            </div>
             <div><span>Materialkosten</span><strong>{formatPrice(total)}</strong></div>
           </div>
         </header>

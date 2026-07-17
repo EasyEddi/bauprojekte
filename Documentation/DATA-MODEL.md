@@ -15,6 +15,7 @@ Durch neue Blob-Pfade pro Bearbeitung kann weder ein CDN-Cache noch eine verzög
 | `id` | UUID | Eindeutige ID |
 | `slug` | Text, eindeutig | Lesbarer Teil der Projekt-URL |
 | `name` | Text | Projektname |
+| `kind` | Enum | `project` oder `idea`; alte Datensätze ohne Feld gelten als `project` |
 | `description` | Text, optional leer | Ausführliche Beschreibung |
 | `image` | URL oder `null` | Optionale öffentliche URL zum Vorschaubild in Vercel Blob |
 | `status` | Text | Aktueller Projektstatus |

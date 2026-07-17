@@ -1,5 +1,6 @@
 export type PriceStatus = "current" | "manual" | "stale";
 export type PriceSource = "server" | "browser" | "manual";
+export type ProjectKind = "project" | "idea";
 
 export type Material = {
   id: string;
@@ -22,6 +23,7 @@ export type Project = {
   createdAt: string;
   updatedAt?: string;
   revision?: string;
+  kind?: ProjectKind;
   name: string;
   summary: string;
   description: string;
@@ -32,6 +34,10 @@ export type Project = {
   duration: string;
   materials: Material[];
 };
+
+export function projectKindLabel(kind?: ProjectKind) {
+  return kind === "idea" ? "Idee" : "Projekt";
+}
 
 export function getProjectTotal(project: Project) {
   return project.materials.reduce((sum, material) => sum + material.quantity * material.unitPriceMinor, 0);

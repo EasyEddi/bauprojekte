@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { PriceSource, PriceStatus } from "@/lib/projects";
+import type { PriceSource, PriceStatus, ProjectKind } from "@/lib/projects";
 
 export type ProjectMaterialInput = {
   id?: string;
@@ -14,6 +14,7 @@ export type ProjectMaterialInput = {
 };
 
 export type ProjectInput = {
+  kind: ProjectKind;
   name: string;
   description: string;
   image: File | null;
@@ -86,11 +87,15 @@ function parseMaterials(raw: FormDataEntryValue | null): ProjectMaterialInput[] 
 }
 
 export function parseProjectInput(form: FormData): ProjectInputResult {
+  const kind = form.get("kind") ?? "project";
   const name = form.get("name");
   const description = form.get("description");
   const image = form.get("image");
   const materials = parseMaterials(form.get("materials"));
 
+  if (kind !== "project" && kind !== "idea") {
+    return { error: "Bitte wähle eine gültige Art aus." };
+  }
   if (typeof name !== "string" || name.trim().length < 2 || name.length > 120) {
     return { error: "Bitte gib einen gültigen Projektnamen ein." };
   }
@@ -107,6 +112,7 @@ export function parseProjectInput(form: FormData): ProjectInputResult {
 
   return {
     data: {
+      kind,
       name: name.trim(),
       description: description.trim(),
       image: optionalImage,

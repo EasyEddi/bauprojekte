@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ExternalLink, ImagePlus, Link2, LoaderCircle, Plus, RefreshCw, Trash2 } from "lucide-react";
-import { formatPrice, type PriceSource, type Project } from "@/lib/projects";
+import { formatPrice, type PriceSource, type Project, type ProjectKind } from "@/lib/projects";
 
 type PriceState = "idle" | "loading" | "current" | "manual" | "error";
 
@@ -99,6 +99,7 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
     }] : [emptyMaterial(1)]);
   const [name, setName] = useState(initialProject?.name ?? "");
   const [description, setDescription] = useState(initialProject?.description ?? "");
+  const [kind, setKind] = useState<ProjectKind>(initialProject?.kind ?? "project");
   const [imageName, setImageName] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -197,6 +198,7 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
     event.preventDefault();
     setError("");
     const form = new FormData(event.currentTarget);
+    form.set("kind", kind);
     form.set("name", name);
     form.set("description", description);
     const validationError = validate(form);
@@ -251,6 +253,7 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
         const confirmed = result.project;
         const valuesMatch = confirmed
           && confirmed.name === name.trim()
+          && (confirmed.kind ?? "project") === kind
           && confirmed.description === description.trim()
           && confirmed.materials.length === submittedMaterials.length
           && confirmed.materials.every((material, index) => {
@@ -277,6 +280,13 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
       <section className="form-section">
         <div className="form-section-title"><h2>Projekt</h2></div>
         <div className="form-grid">
+          <label className="field">
+            <span>Art</span>
+            <select name="kind" value={kind} onChange={(event) => { setKind(event.target.value as ProjectKind); setError(""); }}>
+              <option value="project">Projekt</option>
+              <option value="idea">Idee</option>
+            </select>
+          </label>
           <label className="field field-wide">
             <span>Projektname</span>
             <input name="name" maxLength={120} value={name} placeholder="z. B. Eine eigene Gartenbank" onChange={(event) => { setName(event.target.value); setError(""); }} />

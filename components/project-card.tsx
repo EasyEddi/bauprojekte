@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeleteProjectDialog } from "@/components/delete-project-dialog";
-import { formatPrice, getProjectTotal, type Project } from "@/lib/projects";
+import { formatPrice, getProjectTotal, projectKindLabel, type Project } from "@/lib/projects";
 
 type MenuPosition = { x: number; y: number };
 
@@ -110,7 +110,10 @@ export function ProjectCard({ project, priority = false }: { project: Project; p
             : <div className="card-image-empty" aria-hidden="true" />}
         </div>
         <div className="card-body">
-          <h2>{project.name}</h2>
+          <div className="card-title">
+            <small>{projectKindLabel(project.kind)}</small>
+            <h2>{project.name}</h2>
+          </div>
           <strong>{formatPrice(getProjectTotal(project))}</strong>
         </div>
       </Link>

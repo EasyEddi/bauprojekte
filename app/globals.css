@@ -365,6 +365,24 @@ body {
   white-space: nowrap;
 }
 
+.card-title { min-width: 0; }
+
+.card-title small,
+.detail-overview-title small {
+  display: block;
+  width: fit-content;
+  margin-bottom: 6px;
+  padding: 4px 8px;
+  color: #456451;
+  background: #e6eee5;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 .floating-add {
   width: 56px;
   height: 56px;
@@ -457,6 +475,21 @@ body {
 
 .field input:focus,
 .field textarea:focus {
+  border-color: #568069;
+  box-shadow: 0 0 0 3px rgb(86 128 105 / 14%);
+}
+
+.field select {
+  width: 100%;
+  padding: 13px 14px;
+  color: #1c3025;
+  background: #f8faf7;
+  border: 1px solid #cdd9cf;
+  border-radius: 9px;
+  outline: none;
+}
+
+.field select:focus {
   border-color: #568069;
   box-shadow: 0 0 0 3px rgb(86 128 105 / 14%);
 }
@@ -1064,6 +1097,15 @@ html:not([data-theme="light"]) .form-success { color: #b9dcc2; background: #203a
   letter-spacing: -.04em;
 }
 
+.detail-overview-body > .detail-overview-title {
+  min-width: 0;
+  flex: 1 1 auto;
+  margin-top: 0;
+  text-align: left;
+}
+
+.detail-overview-title small { margin-bottom: 10px; }
+
 .detail-overview-body > div { flex: 0 0 auto; text-align: right; }
 .detail-overview-body span { display: block; margin-bottom: 4px; color: #617568; font-size: 12px; }
 .detail-overview-body strong { color: #9b583d; font-size: 25px; white-space: nowrap; }
@@ -1122,6 +1164,10 @@ html:not([data-theme="light"]) .detail-overview-body h1,
 html:not([data-theme="light"]) .detail-content-card h2 { color: #edf4ef; }
 html:not([data-theme="light"]) .detail-overview-body strong,
 html:not([data-theme="light"]) .detail-total strong { color: #df8b68; }
+html:not([data-theme="light"]) .card-title small,
+html:not([data-theme="light"]) .detail-overview-title small { color: #b9dcc2; background: #203a2b; }
+html:not([data-theme="light"]) .field select { color: #edf4ef; background: #1d2922; border-color: #3b5043; }
+html:not([data-theme="light"]) .field select:focus { border-color: #75a987; box-shadow: 0 0 0 3px rgb(117 169 135 / 18%); }
 html:not([data-theme="light"]) .detail-material-list,
 html:not([data-theme="light"]) .detail-material-row { border-color: #34463b; }
 html:not([data-theme="light"]) .detail-overview-image { background: #223128; }

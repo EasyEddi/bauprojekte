@@ -23,7 +23,7 @@
 
 1. Das Plus am unteren Bildschirmrand öffnet die Anmeldung, falls Eddi noch nicht angemeldet ist.
 2. Nach erfolgreicher Anmeldung öffnet sich das Formular für ein neues Projekt.
-3. Eddi gibt einen Namen ein und kann optional eine Beschreibung sowie ein Bild ergänzen.
+3. Eddi wählt zwischen „Projekt“ und „Idee“, gibt einen Namen ein und kann optional eine Beschreibung sowie ein Bild ergänzen.
 4. Er fügt beliebig viele Materialien mit Name, Menge und Produktlink hinzu.
 5. Das System versucht den Preis serverseitig zu ermitteln.
 6. Falls das nicht gelingt, kann Eddi einen Preis manuell eintragen.
@@ -38,6 +38,7 @@
 - Detailseite pro Projekt
 - Sichere Anmeldung für genau einen Verwalter
 - Projekt erstellen, bearbeiten, veröffentlichen und löschen
+- Art eines Eintrags zwischen „Projekt“ und „Idee“ ändern
 - Eigenes Rechtsklickmenü auf Projektkacheln mit Bearbeiten und Löschen
 - Bild optional hochladen
 - Materialien hinzufügen, ändern und entfernen
