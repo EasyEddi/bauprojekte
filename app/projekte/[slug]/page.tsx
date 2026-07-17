@@ -38,7 +38,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               <small>{projectKindLabel(project.kind)}</small>
               <h1>{project.name}</h1>
             </div>
-            <div><span>Materialkosten</span><strong>{formatPrice(total)}</strong></div>
+            {project.kind !== "idea" && <div><span>Materialkosten</span><strong>{formatPrice(total)}</strong></div>}
           </div>
         </header>
 
@@ -47,7 +47,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <p>{project.description}</p>
         </section>}
 
-        <section className="detail-content-card detail-materials-card">
+        {project.kind !== "idea" && <section className="detail-content-card detail-materials-card">
           <div className="detail-card-heading"><h2>Materialien</h2><span>{project.materials.length} Einträge</span></div>
           <div className="detail-material-list">
             {project.materials.map((material) => {
@@ -69,7 +69,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             })}
           </div>
           <div className="detail-total"><span>Gesamtkosten</span><strong>{formatPrice(total)}</strong></div>
-        </section>
+        </section>}
       </article>
       <FloatingAddButton />
     </>

@@ -103,6 +103,7 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
   const [imageName, setImageName] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const kindLabel = kind === "idea" ? "Idee" : "Projekt";
 
   const total = useMemo(
     () => materials.reduce((sum, material) => sum + (material.priceMinor ?? 0) * Math.max(0, material.quantity), 0),
@@ -139,6 +140,12 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
 
   function removeMaterial(id: number) {
     setMaterials((current) => current.length === 1 ? [emptyMaterial(1)] : current.filter((material) => material.id !== id));
+  }
+
+  function changeKind(nextKind: ProjectKind) {
+    setKind(nextKind);
+    setError("");
+    if (nextKind === "project" && materials.length === 0) setMaterials([emptyMaterial(1)]);
   }
 
   async function syncPrice(id: number) {
@@ -178,9 +185,10 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
 
   function validate(form: FormData) {
     const image = form.get("image");
-    if (name.trim().length < 2) return "Bitte gib einen Projektnamen ein.";
+    if (name.trim().length < 2) return kind === "idea" ? "Bitte gib einen Namen für die Idee ein." : "Bitte gib einen Projektnamen ein.";
     if (image instanceof File && image.size > 2 * 1024 * 1024) return "Das Vorschaubild darf höchstens 2 MB groß sein.";
     if (image instanceof File && image.size > 0 && !["image/jpeg", "image/png", "image/webp"].includes(image.type)) return "Das Vorschaubild muss ein JPG, PNG oder WebP sein.";
+    if (kind === "idea") return "";
     for (const [index, material] of materials.entries()) {
       if (!material.name.trim()) return `Bitte gib eine Bezeichnung für Material ${index + 1} ein.`;
       try {
@@ -209,7 +217,7 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
 
     try {
       setPending(true);
-      const resolvedMaterials = await Promise.all(materials.map(async (material, index) => {
+      const resolvedMaterials = kind === "idea" ? [] : await Promise.all(materials.map(async (material, index) => {
         if (material.priceMinor !== null) return material;
         updateMaterial(material.id, { priceState: "loading", priceError: "" });
         try {
@@ -276,24 +284,28 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
   }
 
   return (
-    <form className="project-form" onSubmit={submit} noValidate>
+    <>
+      <header className="form-header">
+        <h1>{initialProject ? `${kindLabel} bearbeiten` : kind === "idea" ? "Neue Idee" : "Neues Projekt"}</h1>
+      </header>
+      <form className="project-form" onSubmit={submit} noValidate>
       <section className="form-section">
-        <div className="form-section-title"><h2>Projekt</h2></div>
+        <div className="form-section-title"><h2>{kindLabel}</h2></div>
         <div className="form-grid">
           <label className="field">
             <span>Art</span>
-            <select name="kind" value={kind} onChange={(event) => { setKind(event.target.value as ProjectKind); setError(""); }}>
+            <select name="kind" value={kind} onChange={(event) => changeKind(event.target.value as ProjectKind)}>
               <option value="project">Projekt</option>
               <option value="idea">Idee</option>
             </select>
           </label>
           <label className="field field-wide">
-            <span>Projektname</span>
+            <span>{kind === "idea" ? "Ideename" : "Projektname"}</span>
             <input name="name" maxLength={120} value={name} placeholder="z. B. Eine eigene Gartenbank" onChange={(event) => { setName(event.target.value); setError(""); }} />
           </label>
           <label className="field field-wide">
             <span>Beschreibung <small>optional</small></span>
-            <textarea name="description" maxLength={5000} rows={5} value={description} placeholder="Was möchtest du bauen?" onChange={(event) => { setDescription(event.target.value); setError(""); }} />
+            <textarea name="description" maxLength={5000} rows={5} value={description} placeholder={kind === "idea" ? "Was ist deine Idee?" : "Was möchtest du bauen?"} onChange={(event) => { setDescription(event.target.value); setError(""); }} />
           </label>
           <label className="image-upload field-wide">
             <ImagePlus size={28} aria-hidden="true" />
@@ -304,7 +316,7 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
         </div>
       </section>
 
-      <section className="form-section">
+      {kind === "project" && <section className="form-section">
         <div className="form-section-title"><h2>Materialien</h2></div>
         <div className="draft-materials">
           {materials.map((material, index) => (
@@ -338,15 +350,16 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
           ))}
         </div>
         <button className="secondary-button" type="button" onClick={addMaterial}><Plus size={18} /> Weiteres Material</button>
-      </section>
+      </section>}
 
       <div className="form-submit-stack">
         {error && <p className="form-error" role="alert">{error}</p>}
         <div className="form-submit-bar">
-          <div><span>Aktuelle Materialsumme</span><strong>{formatPrice(total)}</strong></div>
-          <button className="primary-button" type="submit" disabled={pending}>{pending ? "Speichert …" : initialProject ? "Änderungen speichern" : "Projekt speichern"} <Check size={18} /></button>
+          {kind === "project" && <div><span>Aktuelle Materialsumme</span><strong>{formatPrice(total)}</strong></div>}
+          <button className="primary-button" type="submit" disabled={pending}>{pending ? "Speichert …" : initialProject ? "Änderungen speichern" : `${kindLabel} speichern`} <Check size={18} /></button>
         </div>
       </div>
-    </form>
+      </form>
+    </>
   );
 }

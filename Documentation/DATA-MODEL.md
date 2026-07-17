@@ -27,6 +27,8 @@ Die Gesamtsumme wird bevorzugt aus den Materialdaten berechnet. Falls sie späte
 
 ### Eingebettete Materialien
 
+Projekte enthalten mindestens ein Material. Ideen werden ohne Materialliste gespeichert (`materials: []`).
+
 | Feld | Typ | Bedeutung |
 | --- | --- | --- |
 | `id` | UUID | Eindeutige ID |

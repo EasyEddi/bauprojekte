@@ -22,9 +22,9 @@
 ## Kernablauf für den Verwalter
 
 1. Das Plus am unteren Bildschirmrand öffnet die Anmeldung, falls Eddi noch nicht angemeldet ist.
-2. Nach erfolgreicher Anmeldung öffnet sich das Formular für ein neues Projekt.
+2. Nach erfolgreicher Anmeldung öffnet sich das Formular für einen neuen Eintrag.
 3. Eddi wählt zwischen „Projekt“ und „Idee“, gibt einen Namen ein und kann optional eine Beschreibung sowie ein Bild ergänzen.
-4. Er fügt beliebig viele Materialien mit Name, Menge und Produktlink hinzu.
+4. Bei einem Projekt fügt er beliebig viele Materialien mit Name, Menge und Produktlink hinzu; bei einer Idee entfällt die Materialliste.
 5. Das System versucht den Preis serverseitig zu ermitteln.
 6. Falls das nicht gelingt, kann Eddi einen Preis manuell eintragen.
 7. Die Gesamtsumme aktualisiert sich bei jeder Änderung.
@@ -41,7 +41,7 @@
 - Art eines Eintrags zwischen „Projekt“ und „Idee“ ändern
 - Eigenes Rechtsklickmenü auf Projektkacheln mit Bearbeiten und Löschen
 - Bild optional hochladen
-- Materialien hinzufügen, ändern und entfernen
+- Materialien bei Projekten hinzufügen, ändern und entfernen
 - Menge und Einzelpreis je Material
 - Automatisch berechnete Material- und Projektsummen
 - Preisermittlung aus strukturierten Produktdaten, wenn der Shop diese bereitstellt

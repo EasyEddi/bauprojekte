@@ -114,7 +114,7 @@ export function ProjectCard({ project, priority = false }: { project: Project; p
             <small>{projectKindLabel(project.kind)}</small>
             <h2>{project.name}</h2>
           </div>
-          <strong>{formatPrice(getProjectTotal(project))}</strong>
+          {project.kind !== "idea" && <strong>{formatPrice(getProjectTotal(project))}</strong>}
         </div>
       </Link>
 

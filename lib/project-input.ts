@@ -52,7 +52,7 @@ function parseMaterials(raw: FormDataEntryValue | null): ProjectMaterialInput[] 
   } catch {
     return null;
   }
-  if (!Array.isArray(values) || values.length < 1 || values.length > 50) return null;
+  if (!Array.isArray(values) || values.length > 50) return null;
 
   const materials = values.map((value) => {
     if (typeof value.name !== "string" || value.name.trim().length < 1 || value.name.length > 120) return null;
@@ -106,7 +106,7 @@ export function parseProjectInput(form: FormData): ProjectInputResult {
   if (optionalImage !== null && !isAllowedImage(optionalImage)) {
     return { error: "Bitte wähle ein JPG-, PNG- oder WebP-Bild bis 2 MB aus." };
   }
-  if (!materials) {
+  if (!materials || (kind === "project" && materials.length < 1)) {
     return { error: "Bitte prüfe die Materialangaben." };
   }
 

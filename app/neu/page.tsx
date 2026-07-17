@@ -40,10 +40,9 @@ export default async function NewProjectPage({ searchParams }: { searchParams: P
       <Link className="back-link" href="/">
         <ArrowLeft size={18} aria-hidden="true" /> Zur Übersicht
       </Link>
-      <header className="form-header">
-        <h1>{authenticated ? "Neues Projekt" : "Anmelden"}</h1>
-      </header>
-      {authenticated ? <ProjectForm initialImport={importedMaterial} /> : <AdminLogin />}
+      {authenticated
+        ? <ProjectForm initialImport={importedMaterial} />
+        : <><header className="form-header"><h1>Anmelden</h1></header><AdminLogin /></>}
     </div>
   );
 }
