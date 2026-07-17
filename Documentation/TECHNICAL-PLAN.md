@@ -99,6 +99,7 @@ Das ist „nahezu aktuell“, ohne Shops bei jedem Besuch unnötig anzufragen od
 5. Das Löschen entfernt Projektdatei und optionales Vorschaubild erst nach einer eigenen Bestätigung.
 6. Projektdateien werden mit Blob-Zeitstempel und einer eindeutigen Abruf-ID cachefrei gelesen. Nach erfolgreichem Bearbeiten lädt der Browser die Projektseite vollständig neu.
 7. Eine beim Öffnen laufende Preisprüfung verändert nur die aktuelle Seitenansicht und schreibt niemals eine möglicherweise ältere Projektkopie zurück. Dauerhafte Projektdaten werden ausschließlich durch Erstellen oder Bearbeiten geändert.
+8. Der Bearbeitungseditor sendet Name, Beschreibung und Materialien aus seinem kontrollierten React-Zustand. Vor der Weiterleitung vergleicht er diese Werte mit der vom Server bestätigten Projektversion und meldet eine Abweichung sichtbar als Fehler.
 
 ## Beobachtbarkeit und Fehlerbehandlung
 

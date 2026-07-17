@@ -28,7 +28,10 @@ export async function PATCH(request: Request, { params }: ProjectRouteContext) {
   try {
     const project = await updateProject(slug, parsed.data);
     if (!project) return NextResponse.json({ error: "Projekt nicht gefunden." }, { status: 404 });
-    return NextResponse.json({ slug: project.slug });
+    return NextResponse.json(
+      { slug: project.slug, project },
+      { headers: { "cache-control": "no-store" } },
+    );
   } catch (error) {
     console.error("Projekt konnte nicht aktualisiert werden:", error instanceof Error ? error.message : "Unbekannter Fehler");
     return NextResponse.json({ error: "Das Projekt konnte nicht aktualisiert werden." }, { status: 500 });

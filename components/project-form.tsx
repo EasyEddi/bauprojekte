@@ -97,6 +97,8 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
       priceSource: "browser",
       lastCheckedAt: new Date().toISOString(),
     }] : [emptyMaterial(1)]);
+  const [name, setName] = useState(initialProject?.name ?? "");
+  const [description, setDescription] = useState(initialProject?.description ?? "");
   const [imageName, setImageName] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -174,9 +176,8 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
   }
 
   function validate(form: FormData) {
-    const name = form.get("name");
     const image = form.get("image");
-    if (typeof name !== "string" || name.trim().length < 2) return "Bitte gib einen Projektnamen ein.";
+    if (name.trim().length < 2) return "Bitte gib einen Projektnamen ein.";
     if (image instanceof File && image.size > 2 * 1024 * 1024) return "Das Vorschaubild darf höchstens 2 MB groß sein.";
     if (image instanceof File && image.size > 0 && !["image/jpeg", "image/png", "image/webp"].includes(image.type)) return "Das Vorschaubild muss ein JPG, PNG oder WebP sein.";
     for (const [index, material] of materials.entries()) {
@@ -196,6 +197,8 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
     event.preventDefault();
     setError("");
     const form = new FormData(event.currentTarget);
+    form.set("name", name);
+    form.set("description", description);
     const validationError = validate(form);
     if (validationError) {
       setError(validationError);
@@ -219,7 +222,7 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
         }
       }));
 
-      form.set("materials", JSON.stringify(resolvedMaterials.map((material) => ({
+      const submittedMaterials = resolvedMaterials.map((material) => ({
         id: material.storedId,
         name: material.name,
         productUrl: material.url,
@@ -228,13 +231,14 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
         priceStatus: material.priceState === "manual" ? "manual" : "current",
         priceSource: material.priceSource,
         lastCheckedAt: material.lastCheckedAt,
-      }))));
+      }));
+      form.set("materials", JSON.stringify(submittedMaterials));
 
       const response = await fetch(initialProject ? `/api/projects/${initialProject.slug}` : "/api/projects", {
         method: initialProject ? "PATCH" : "POST",
         body: form,
       });
-      const result = await response.json().catch(() => ({})) as { error?: string; slug?: string };
+      const result = await response.json().catch(() => ({})) as { error?: string; slug?: string; project?: Project };
       if (response.status === 401) {
         router.refresh();
         return;
@@ -242,6 +246,23 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
       if (!response.ok || !result.slug) {
         setError(result.error ?? `Das Projekt konnte nicht ${initialProject ? "aktualisiert" : "gespeichert"} werden. Bitte versuche es erneut.`);
         return;
+      }
+      if (initialProject) {
+        const confirmed = result.project;
+        const valuesMatch = confirmed
+          && confirmed.name === name.trim()
+          && confirmed.description === description.trim()
+          && confirmed.materials.length === submittedMaterials.length
+          && confirmed.materials.every((material, index) => {
+            const submitted = submittedMaterials[index];
+            return material.name === submitted.name.trim()
+              && material.productUrl === new URL(submitted.productUrl).toString()
+              && material.quantity === submitted.quantity;
+          });
+        if (!valuesMatch) {
+          setError("Der Server hat nicht alle Änderungen bestätigt. Bitte lade die Seite neu und versuche es noch einmal.");
+          return;
+        }
       }
       window.location.assign(`/projekte/${result.slug}?saved=${Date.now()}`);
     } catch (submitError) {
@@ -258,11 +279,11 @@ export function ProjectForm({ initialImport, initialProject }: ProjectFormProps)
         <div className="form-grid">
           <label className="field field-wide">
             <span>Projektname</span>
-            <input name="name" maxLength={120} defaultValue={initialProject?.name} placeholder="z. B. Eine eigene Gartenbank" onChange={() => setError("")} />
+            <input name="name" maxLength={120} value={name} placeholder="z. B. Eine eigene Gartenbank" onChange={(event) => { setName(event.target.value); setError(""); }} />
           </label>
           <label className="field field-wide">
             <span>Beschreibung <small>optional</small></span>
-            <textarea name="description" maxLength={5000} rows={5} defaultValue={initialProject?.description} placeholder="Was möchtest du bauen?" onChange={() => setError("")} />
+            <textarea name="description" maxLength={5000} rows={5} value={description} placeholder="Was möchtest du bauen?" onChange={(event) => { setDescription(event.target.value); setError(""); }} />
           </label>
           <label className="image-upload field-wide">
             <ImagePlus size={28} aria-hidden="true" />
