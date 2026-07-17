@@ -4,7 +4,9 @@ Alle Geldwerte werden als Ganzzahl in der kleinsten Währungseinheit gespeichert
 
 ## Projektdatei in Vercel Blob
 
-Jedes Projekt liegt unter `projects/<slug>.json`. Bilddateien liegen getrennt unter `images/<slug>.<endung>`. Dadurch kann ein Projekt unabhängig gelesen oder später ersetzt werden, ohne eine gemeinsame JSON-Datei konkurrierend zu überschreiben.
+Jede gespeicherte Projektversion liegt unveränderlich unter `projects/<slug>/<zeitstempel>-<revision>.json`. Beim Lesen wird pro Slug ausschließlich die neueste Kombination aus `updatedAt` und `revision` verwendet. Bestehende Dateien unter `projects/<slug>.json` bleiben als lesbare Legacy-Version erhalten, verlieren aber gegen jede neuere Revision. Bilddateien liegen getrennt unter `images/<slug>.<endung>`.
+
+Durch neue Blob-Pfade pro Bearbeitung kann weder ein CDN-Cache noch eine verzögerte Listenantwort den Inhalt einer neueren Revision überschreiben. Alte Revisionen bleiben als kleiner Wiederherstellungsverlauf erhalten und werden beim Löschen eines Projekts gemeinsam entfernt.
 
 ### Projektfelder
 
@@ -17,6 +19,8 @@ Jedes Projekt liegt unter `projects/<slug>.json`. Bilddateien liegen getrennt un
 | `image` | URL oder `null` | Optionale öffentliche URL zum Vorschaubild in Vercel Blob |
 | `status` | Text | Aktueller Projektstatus |
 | `createdAt` | Zeitstempel | Erstellung |
+| `updatedAt` | Zeitstempel | Zeitpunkt der gespeicherten Revision |
+| `revision` | UUID | Eindeutige, unveränderliche Versionskennung |
 
 Die Gesamtsumme wird bevorzugt aus den Materialdaten berechnet. Falls sie später für schnellere Übersichten zwischengespeichert wird, muss die Datenbank sie bei jeder Materialänderung neu berechnen.
 

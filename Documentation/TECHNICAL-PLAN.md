@@ -100,6 +100,7 @@ Das ist „nahezu aktuell“, ohne Shops bei jedem Besuch unnötig anzufragen od
 6. Projektdateien werden mit Blob-Zeitstempel und einer eindeutigen Abruf-ID cachefrei gelesen. Nach erfolgreichem Bearbeiten lädt der Browser die Projektseite vollständig neu.
 7. Eine beim Öffnen laufende Preisprüfung verändert nur die aktuelle Seitenansicht und schreibt niemals eine möglicherweise ältere Projektkopie zurück. Dauerhafte Projektdaten werden ausschließlich durch Erstellen oder Bearbeiten geändert.
 8. Der Bearbeitungseditor sendet Name, Beschreibung und Materialien aus seinem kontrollierten React-Zustand. Vor der Weiterleitung vergleicht er diese Werte mit der vom Server bestätigten Projektversion und meldet eine Abweichung sichtbar als Fehler.
+9. Jede Bearbeitung erzeugt eine unveränderliche Blob-Revision unter einem neuen Pfad. Beim Lesen wird pro Projekt-Slug ausschließlich die neueste Revision ausgewählt; ältere Dateien können dadurch weder per Cache noch durch verspätete Antworten erneut zum aktuellen Stand werden.
 
 ## Beobachtbarkeit und Fehlerbehandlung
 

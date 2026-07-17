@@ -21,9 +21,17 @@ export async function getProjects(): Promise<Project[]> {
       }),
   );
 
-  return projects
-    .filter((project): project is Project => project !== null)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const latestBySlug = new Map<string, Project>();
+  for (const project of projects.filter((entry): entry is Project => entry !== null)) {
+    const current = latestBySlug.get(project.slug);
+    const projectVersion = `${project.updatedAt ?? project.createdAt}:${project.revision ?? "legacy"}`;
+    const currentVersion = current
+      ? `${current.updatedAt ?? current.createdAt}:${current.revision ?? "legacy"}`
+      : "";
+    if (!current || projectVersion > currentVersion) latestBySlug.set(project.slug, project);
+  }
+
+  return [...latestBySlug.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
@@ -76,10 +84,12 @@ function projectMaterials(input: ProjectMaterialInput[], now: Date, existing: Pr
 }
 
 async function writeProject(project: Project) {
-  await put(`${projectPrefix}${project.slug}.json`, JSON.stringify(project), {
+  if (!project.updatedAt || !project.revision) throw new Error("Projektversion fehlt.");
+  const versionKey = project.updatedAt.replace(/[:.]/g, "-");
+  await put(`${projectPrefix}${project.slug}/${versionKey}-${project.revision}.json`, JSON.stringify(project), {
     access: "public",
     addRandomSuffix: false,
-    allowOverwrite: true,
+    allowOverwrite: false,
     contentType: "application/json; charset=utf-8",
   });
 }
@@ -126,6 +136,8 @@ export async function saveProject(input: ProjectInput): Promise<Project> {
     id: crypto.randomUUID(),
     slug,
     createdAt: now.toISOString(),
+    updatedAt: now.toISOString(),
+    revision: crypto.randomUUID(),
     name: input.name,
     summary: input.description.slice(0, 180),
     description: input.description,
@@ -159,6 +171,8 @@ export async function updateProject(slug: string, input: ProjectInput): Promise<
   const now = new Date();
   const project: Project = {
     ...existing,
+    updatedAt: now.toISOString(),
+    revision: crypto.randomUUID(),
     name: input.name,
     summary: input.description.slice(0, 180),
     description: input.description,
@@ -175,6 +189,10 @@ export async function updateProject(slug: string, input: ProjectInput): Promise<
 export async function deleteProject(slug: string): Promise<boolean> {
   const existing = await getProjectBySlug(slug);
   if (!existing) return false;
-  await del([`${projectPrefix}${slug}.json`, ...(existing.image ? [existing.image] : [])]);
+  const { blobs } = await list({ prefix: projectPrefix, limit: 1000 });
+  const projectBlobs = blobs
+    .filter((blob) => blob.pathname === `${projectPrefix}${slug}.json` || blob.pathname.startsWith(`${projectPrefix}${slug}/`))
+    .map((blob) => blob.url);
+  await del([...projectBlobs, ...(existing.image ? [existing.image] : [])]);
   return true;
 }

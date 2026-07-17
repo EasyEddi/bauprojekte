@@ -20,6 +20,8 @@ export type Project = {
   id: string;
   slug: string;
   createdAt: string;
+  updatedAt?: string;
+  revision?: string;
   name: string;
   summary: string;
   description: string;
